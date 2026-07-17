@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MaterialType {
+  VIDEO
+  DOCUMENT
+  LINK
+  TEXT
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+// Synced from Clerk via the user.created/updated webhook — id is the Clerk userId.
+model User {
+  id       String  @id
+  email    String  @unique
+  name     String
+  imageUrl String?
+  role     Role    @default(STUDENT)
+
+  enrollments        Enrollment[]
+  instructingClasses Class[]      @relation("ClassInstructor")
+  createdCourses     Course[]     @relation("CourseCreatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String       @id @default(uuid())
+  title       String
+  description String?      @db.Text
+  coverImage  String?
+  status      CourseStatus @default(DRAFT)
+
+  createdById String
+  createdBy   User   @relation("CourseCreatedBy", fields: [createdById], references: [id])
+
+  modules CourseModule[]
+  classes Class[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdById])
+  @@index([status])
+}
+
+model CourseModule {
+  id       String @id @default(uuid())
+  courseId String
+  title    String
+  order    Int
+
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model Session {
+  id          String  @id @default(uuid())
+  moduleId    String
+  title       String
+  description String? @db.Text
+  order       Int
+
+  module    CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  materials Material[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([moduleId])
+}
+
+model Material {
+  id        String       @id @default(uuid())
+  sessionId String
+  type      MaterialType
+  title     String
+  url       String?      @db.Text // external link (LINK type only)
+  content   String?      @db.Text // inline text body (TEXT type only)
+  fileKey   String? // S3/MinIO object key (VIDEO/DOCUMENT types only)
+  fileType  String?
+  fileSize  Int?
+  order     Int          @default(0)
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+}
+
+// A running cohort / offering of a Course, taught by an instructor, with an enrolled roster.
+model Class {
+  id           String    @id @default(uuid())
+  courseId     String
+  name         String
+  startDate    DateTime?
+  endDate      DateTime?
+  instructorId String?
+
+  course      Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  instructor  User?  @relation("ClassInstructor", fields: [instructorId], references: [id])
+  enrollments Enrollment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([instructorId])
+}
+
+model Enrollment {
+  id         String           @id @default(uuid())
+  classId    String
+  studentId  String
+  status     EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime         @default(now())
+
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, studentId])
+  @@index([classId])
+  @@index([studentId])
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2 (Class Activity: attendance) — not built in V1, modeled ahead of time
+// so the schema doesn't need reshaping later.
+// ---------------------------------------------------------------------------
+
+// enum AttendanceStatus { PRESENT ABSENT LATE EXCUSED }
+//
+// model ClassSession {
+//   id          String   @id @default(uuid())
+//   classId     String
+//   sessionId   String
+//   scheduledAt DateTime
+//   class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+//   session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+//   attendance  Attendance[]
+//   @@unique([classId, sessionId])
+// }
+//
+// model Attendance {
+//   id             String           @id @default(uuid())
+//   classSessionId String
+//   studentId      String
+//   status         AttendanceStatus
+//   note           String?          @db.Text
+//   classSession   ClassSession     @relation(fields: [classSessionId], references: [id], onDelete: Cascade)
+//   student        User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+//   @@unique([classSessionId, studentId])
+// }
+
+// ---------------------------------------------------------------------------
+// Phase 3 (Tests & Submissions) — not built in V1, modeled ahead of time.
+// ---------------------------------------------------------------------------
+
+// model Assignment {
+//   id           String    @id @default(uuid())
+//   classId      String
+//   title        String
+//   instructions String?   @db.Text
+//   dueDate      DateTime?
+//   maxScore     Int?
+//   class        Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+//   submissions  Submission[]
+// }
+//
+// model Submission {
+//   id           String    @id @default(uuid())
+//   assignmentId String
+//   studentId    String
+//   fileKey      String?
+//   url          String?   @db.Text
+//   text         String?   @db.Text
+//   submittedAt  DateTime  @default(now())
+//   score        Int?
+//   feedback     String?   @db.Text
+//   assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+//   student      User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+//   @@unique([assignmentId, studentId])
+// }

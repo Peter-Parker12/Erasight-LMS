@@ -30,22 +30,18 @@ import {
 type UploadedFile = { fileKey: string; fileType: string; fileSize: number };
 
 async function uploadFile(file: File): Promise<UploadedFile> {
-  const presignRes = await fetch("/api/uploads/presign", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fileName: file.name, fileType: file.type || "application/octet-stream" }),
-  });
-  if (!presignRes.ok) throw new Error("Could not get an upload URL.");
-  const { uploadUrl, fileKey } = await presignRes.json();
+  const fileType = file.type || "application/octet-stream";
+  const params = new URLSearchParams({ fileName: file.name, fileType });
 
-  const putRes = await fetch(uploadUrl, {
+  const res = await fetch(`/api/uploads?${params}`, {
     method: "PUT",
-    headers: { "Content-Type": file.type || "application/octet-stream" },
+    headers: { "Content-Type": fileType },
     body: file,
   });
-  if (!putRes.ok) throw new Error("Upload failed.");
+  if (!res.ok) throw new Error("Upload failed.");
+  const { fileKey } = await res.json();
 
-  return { fileKey, fileType: file.type || "application/octet-stream", fileSize: file.size };
+  return { fileKey, fileType, fileSize: file.size };
 }
 
 export function MaterialDialog({

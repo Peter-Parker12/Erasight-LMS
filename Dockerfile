@@ -1,6 +1,10 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+# npm ci runs the postinstall hook (`prisma generate`), which needs the
+# schema present — copy it in before installing, not after.
+COPY prisma ./prisma
+COPY prisma.config.ts ./
 RUN npm ci
 
 # Used only by the one-shot `migrate` compose service. Keeps the full

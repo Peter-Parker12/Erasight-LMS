@@ -1,12 +1,15 @@
 import { createSafeActionClient } from "next-safe-action";
-import { auth } from "@clerk/nextjs/server";
 
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { Role } from "@prisma/client";
 
 export class ActionError extends Error {}
 
-const actionClient = createSafeActionClient({
+// Unauthenticated-safe base client — only for actions that must work before a
+// session exists, like accepting an invitation. Everything else should use
+// authActionClient below.
+export const publicActionClient = createSafeActionClient({
   handleServerError(e) {
     if (e instanceof ActionError) return e.message;
     console.error("Action error:", e);
@@ -14,12 +17,12 @@ const actionClient = createSafeActionClient({
   },
 });
 
-// Any signed-in user with a synced local User row.
-export const authActionClient = actionClient.use(async ({ next }) => {
-  const { userId } = await auth();
-  if (!userId) throw new ActionError("Unauthorized");
+// Any signed-in user.
+export const authActionClient = publicActionClient.use(async ({ next }) => {
+  const session = await auth();
+  if (!session?.user) throw new ActionError("Unauthorized");
 
-  const user = await db.user.findUnique({ where: { id: userId } });
+  const user = await db.user.findUnique({ where: { id: session.user.id } });
   if (!user) throw new ActionError("Unauthorized");
 
   return next({ ctx: { user } });

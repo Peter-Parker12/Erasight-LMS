@@ -6,23 +6,22 @@ RUN npm ci
 # Used only by the one-shot `migrate` compose service. Keeps the full
 # node_modules (prisma CLI + its own dependency tree) rather than trying to
 # cherry-pick prisma's runtime deps into the trimmed `runner` image below.
+# Also runs the initial-admin bootstrap script right after migrating, so a
+# single `docker compose up` leaves you with a working ADMIN account with no
+# manual step (see scripts/bootstrap-admin.mjs).
 FROM node:22-alpine AS migrator
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
-CMD ["npx", "prisma", "migrate", "deploy"]
+COPY scripts ./scripts
+CMD ["sh", "-c", "npx prisma migrate deploy && node scripts/bootstrap-admin.mjs"]
 
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Baked into the client bundle / build output — safe to be public, but must be
-# present at build time (unlike runtime-only secrets passed via compose env).
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 # Keeps Server Function closures decryptable across rebuilds/redeploys.
 # See: https://nextjs.org/docs/app/guides/self-hosting#server-functions-encryption-key

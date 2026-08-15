@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { Menu } from "lucide-react";
 import type { Role } from "@prisma/client";
 
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Sidebar } from "./sidebar";
 
 export function Navbar({ role, name }: { role: Role; name: string }) {
@@ -33,7 +33,7 @@ export function Navbar({ role, name }: { role: Role; name: string }) {
       <div className="flex items-center gap-3">
         <span className="hidden text-sm text-muted-foreground sm:inline">{name}</span>
         <Badge variant="secondary">{role}</Badge>
-        <UserButton />
+        <SignOutButton />
       </div>
     </header>
   );

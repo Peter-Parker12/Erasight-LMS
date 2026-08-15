@@ -31,20 +31,39 @@ enum EnrollmentStatus {
   DROPPED
 }
 
-// Synced from Clerk via the user.created/updated webhook — id is the Clerk userId.
 model User {
-  id       String  @id
-  email    String  @unique
-  name     String
-  imageUrl String?
-  role     Role    @default(STUDENT)
+  id           String @id @default(uuid())
+  email        String @unique
+  name         String
+  passwordHash String
+  role         Role   @default(STUDENT)
 
   enrollments        Enrollment[]
   instructingClasses Class[]      @relation("ClassInstructor")
   createdCourses     Course[]     @relation("CourseCreatedBy")
+  sentInvitations    Invitation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// An admin-issued invite: sets the email + role in advance, sent via email
+// with a link to /invite/[token]. Accepting it creates the User.
+model Invitation {
+  id         String    @id @default(uuid())
+  email      String
+  role       Role
+  token      String    @unique
+  invitedById String
+  expiresAt  DateTime
+  acceptedAt DateTime?
+
+  invitedBy User @relation(fields: [invitedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([invitedById])
 }
 
 model Course {

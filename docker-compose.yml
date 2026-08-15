@@ -37,11 +37,14 @@ services:
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
     env_file: .env
     restart: unless-stopped
-    # The app itself — reachable directly at <host>:5895, independent of the
-    # db/storage 3748+n range below (those are internal/admin-access ports,
-    # not part of what's being exposed here).
+    # The app itself. Bound to 127.0.0.1 only — public HTTPS/domain routing
+    # is handled by Cloudflare Tunnel (cloudflared), which runs separately
+    # (not part of this compose stack) and connects to this port locally.
+    # There's no reverse proxy in this stack anymore: the VPS doesn't need
+    # any inbound port open to the public internet for this app at all.
+    # Point your cloudflared config's ingress at http://localhost:5895.
     ports:
-      - "5895:3000"
+      - "127.0.0.1:5895:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -90,34 +93,6 @@ services:
       S3_BUCKET: ${S3_BUCKET:-erasight-lms}
     restart: "no"
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    # Host port 80 was already taken by another service on this VPS, so HTTP
-    # (plain, non-TLS) traffic is on 9302 instead of 80 here. 443 is left
-    # alone. This has a real consequence: Let's Encrypt's default HTTP-01
-    # challenge needs port 80 reachable at the domain from the public
-    # internet, and nothing forwards the real port 80 to this container
-    # anymore. Caddy should still obtain a certificate automatically via the
-    # TLS-ALPN-01 challenge instead (uses port 443, which is still mapped
-    # normally) — but if certs stop renewing, that's why: verify with
-    # `docker compose logs caddy` after `up`, and see the Caddy docs on
-    # forcing a specific ACME challenge type if TLS-ALPN-01 doesn't kick in
-    # automatically.
-    ports:
-      - "9302:80"
-      - "443:443"
-    environment:
-      DOMAIN: ${DOMAIN}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - web
-
 volumes:
   pgdata:
   miniodata:
-  caddy_data:
-  caddy_config:

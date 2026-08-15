@@ -31,7 +31,7 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Self-hosted behind Caddy — trust the forwarded Host header.
+  // Self-hosted behind Cloudflare Tunnel — trust the forwarded Host header.
   trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/sign-in" },

@@ -3,7 +3,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 // S3-compatible client — points at MinIO in Docker Compose by default,
 // swap to Cloudflare R2 (or any S3-compatible endpoint) via env vars alone.
 // MinIO here is never reachable from the browser: it has no public route
-// (no domain, no Caddy proxy), only this server-side client talks to it
+// (no domain, no reverse proxy), only this server-side client talks to it
 // directly over the internal Docker network. All uploads/downloads are
 // relayed through the app's own /api/uploads and /api/files/[...key] routes.
 export const s3 = new S3Client({

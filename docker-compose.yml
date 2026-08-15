@@ -37,8 +37,11 @@ services:
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
     env_file: .env
     restart: unless-stopped
+    # The app itself — reachable directly at <host>:5895, independent of the
+    # db/storage 3748+n range below (those are internal/admin-access ports,
+    # not part of what's being exposed here).
     ports:
-      - "3748:3000"
+      - "5895:3000"
     depends_on:
       db:
         condition: service_healthy

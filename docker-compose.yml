@@ -93,11 +93,19 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
-    # Left on the standard 80/443 (not renumbered like the other services):
-    # Let's Encrypt's automatic HTTPS validates against these exact ports on
-    # the public IP, so moving them would silently break certificate issuance.
+    # Host port 80 was already taken by another service on this VPS, so HTTP
+    # (plain, non-TLS) traffic is on 9302 instead of 80 here. 443 is left
+    # alone. This has a real consequence: Let's Encrypt's default HTTP-01
+    # challenge needs port 80 reachable at the domain from the public
+    # internet, and nothing forwards the real port 80 to this container
+    # anymore. Caddy should still obtain a certificate automatically via the
+    # TLS-ALPN-01 challenge instead (uses port 443, which is still mapped
+    # normally) — but if certs stop renewing, that's why: verify with
+    # `docker compose logs caddy` after `up`, and see the Caddy docs on
+    # forcing a specific ACME challenge type if TLS-ALPN-01 doesn't kick in
+    # automatically.
     ports:
-      - "80:80"
+      - "9302:80"
       - "443:443"
     environment:
       DOMAIN: ${DOMAIN}

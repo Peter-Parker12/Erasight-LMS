@@ -2,6 +2,7 @@ import { startOfMonth, subMonths, format } from "date-fns";
 
 import { db } from "@/lib/db";
 import { CourseStatus } from "@prisma/client";
+import { isEnrollmentActive } from "@/lib/access";
 import type { RecentMaterial } from "@/app/(dashboard)/_components/dashboard/recent-materials";
 
 const TREND_MONTHS = 6;
@@ -152,7 +153,11 @@ export async function getStudentDashboardData(studentId: string) {
     orderBy: { enrolledAt: "desc" },
   });
 
-  const courseIds = [...new Set(enrollments.map((e) => e.class.course.id))];
+  // Only classes the student still has active access to should surface fresh
+  // materials on the dashboard — an expired enrollment shouldn't tease
+  // content the student can no longer open.
+  const activeEnrollments = enrollments.filter(isEnrollmentActive);
+  const courseIds = [...new Set(activeEnrollments.map((e) => e.class.course.id))];
 
   const recentMaterialsRaw = await db.material.findMany({
     where: { session: { module: { courseId: { in: courseIds } } } },
@@ -168,6 +173,7 @@ export async function getStudentDashboardData(studentId: string) {
       className: e.class.name,
       courseTitle: e.class.course.title,
       status: e.status,
+      accessExpiresAt: e.accessExpiresAt,
     })),
     recentMaterials: toRecentMaterials(recentMaterialsRaw),
   };

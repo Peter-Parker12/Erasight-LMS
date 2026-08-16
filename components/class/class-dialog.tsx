@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
 
 import { createClass, updateClass } from "@/actions/classes";
+import { toDateInputValue } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,10 +38,6 @@ const schema = z.object({
   endDate: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
-
-function toDateInput(date: Date | null | undefined) {
-  return date ? date.toISOString().slice(0, 10) : "";
-}
 
 export function ClassDialog({
   trigger,
@@ -75,8 +72,8 @@ export function ClassDialog({
       courseId: courses?.[0]?.id,
       name: klass?.name ?? "",
       instructorId: klass?.instructorId ?? NO_INSTRUCTOR,
-      startDate: toDateInput(klass?.startDate),
-      endDate: toDateInput(klass?.endDate),
+      startDate: toDateInputValue(klass?.startDate),
+      endDate: toDateInputValue(klass?.endDate),
     },
   });
 

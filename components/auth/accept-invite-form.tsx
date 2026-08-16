@@ -21,7 +21,15 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
-export function AcceptInviteForm({ token, email }: { token: string; email: string }) {
+export function AcceptInviteForm({
+  token,
+  email,
+  defaultName,
+}: {
+  token: string;
+  email: string;
+  defaultName: string;
+}) {
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
@@ -32,7 +40,7 @@ export function AcceptInviteForm({ token, email }: { token: string; email: strin
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", password: "", confirmPassword: "" },
+    defaultValues: { name: defaultName, password: "", confirmPassword: "" },
   });
 
   const { execute, isExecuting } = useAction(acceptInvitation, {

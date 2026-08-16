@@ -20,8 +20,10 @@ import {
 export type PendingInvitation = {
   id: string;
   email: string;
+  name: string;
   role: string;
   expiresAt: Date;
+  classGrants: { id: string; className: string; accessExpiresAt: Date | null }[];
 };
 
 export function PendingInvitations({ invitations }: { invitations: PendingInvitation[] }) {
@@ -37,8 +39,10 @@ export function PendingInvitations({ invitations }: { invitations: PendingInvita
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Classes</TableHead>
           <TableHead>Expires</TableHead>
           <TableHead className="w-10" />
         </TableRow>
@@ -46,9 +50,25 @@ export function PendingInvitations({ invitations }: { invitations: PendingInvita
       <TableBody>
         {invitations.map((invitation) => (
           <TableRow key={invitation.id}>
+            <TableCell>{invitation.name || "—"}</TableCell>
             <TableCell>{invitation.email}</TableCell>
             <TableCell>
               <Badge variant="secondary">{invitation.role}</Badge>
+            </TableCell>
+            <TableCell className="text-sm text-muted-foreground">
+              {invitation.classGrants.length === 0 ? (
+                "—"
+              ) : (
+                <div className="space-y-0.5">
+                  {invitation.classGrants.map((g) => (
+                    <div key={g.id}>
+                      {g.className} (
+                      {g.accessExpiresAt ? `expires ${format(g.accessExpiresAt, "MMM d, yyyy")}` : "no expiry"}
+                      )
+                    </div>
+                  ))}
+                </div>
+              )}
             </TableCell>
             <TableCell className="text-muted-foreground">
               {format(invitation.expiresAt, "MMM d, yyyy")}

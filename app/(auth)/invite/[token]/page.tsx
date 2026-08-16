@@ -5,7 +5,12 @@ import { AcceptInviteForm } from "@/components/auth/accept-invite-form";
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
 
-  const invitation = await db.invitation.findUnique({ where: { token } });
+  const invitation = await db.invitation.findUnique({
+    where: { token },
+    include: {
+      classGrants: { include: { class: { include: { course: { select: { title: true } } } } } },
+    },
+  });
 
   const isInvalid =
     !invitation || invitation.acceptedAt !== null || invitation.expiresAt < new Date();
@@ -31,10 +36,18 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
         <CardDescription>
           You&apos;ve been invited to Erasight LMS as {invitation.role.toLowerCase()} (
           {invitation.email}).
+          {invitation.classGrants.length > 0 && (
+            <>
+              {" "}
+              You&apos;ll have access to:{" "}
+              {invitation.classGrants.map((g) => `${g.class.course.title} — ${g.class.name}`).join(", ")}
+              .
+            </>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <AcceptInviteForm token={token} email={invitation.email} />
+        <AcceptInviteForm token={token} email={invitation.email} defaultName={invitation.name} />
       </CardContent>
     </Card>
   );

@@ -6,6 +6,7 @@ import { MaterialType, Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { materialObjectUrl } from "@/lib/s3";
+import { isEnrollmentActive } from "@/lib/access";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,10 +53,12 @@ export default async function ClassDetailPage({
 
   const isAdmin = user.role === Role.ADMIN;
   const isOwningInstructor = user.role === Role.INSTRUCTOR && klass.instructorId === user.id;
-  const isEnrolledStudent =
-    user.role === Role.STUDENT && klass.enrollments.some((e) => e.studentId === user.id);
+  const myEnrollment =
+    user.role === Role.STUDENT ? klass.enrollments.find((e) => e.studentId === user.id) : undefined;
 
-  if (!isAdmin && !isOwningInstructor && !isEnrolledStudent) notFound();
+  if (!isAdmin && !isOwningInstructor && !myEnrollment) notFound();
+
+  const isExpiredStudent = !!myEnrollment && !isEnrollmentActive(myEnrollment);
 
   const canManageRoster = isAdmin;
   const canSeeRoster = isAdmin || isOwningInstructor;
@@ -158,6 +161,7 @@ export default async function ClassDetailPage({
                 name: e.student.name,
                 email: e.student.email,
                 status: e.status,
+                accessExpiresAt: e.accessExpiresAt,
               }))}
             />
           </CardContent>
@@ -166,7 +170,17 @@ export default async function ClassDetailPage({
 
       <div>
         <h2 className="mb-3 text-lg font-medium">Course content</h2>
-        <CurriculumView modules={modules} />
+        {isExpiredStudent ? (
+          <Card>
+            <CardContent className="py-6 text-sm text-muted-foreground">
+              Your access to this class expired on{" "}
+              {myEnrollment?.accessExpiresAt && format(myEnrollment.accessExpiresAt, "MMM d, yyyy")}.
+              Contact an administrator if you believe this is a mistake.
+            </CardContent>
+          </Card>
+        ) : (
+          <CurriculumView modules={modules} />
+        )}
       </div>
     </div>
   );

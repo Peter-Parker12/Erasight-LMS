@@ -5,7 +5,9 @@ import { Role } from "@prisma/client";
 
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { isEnrollmentActive } from "@/lib/access";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClassDialog } from "@/components/class/class-dialog";
 
@@ -26,6 +28,7 @@ export default async function ClassesPage() {
       course: { select: { id: true, title: true } },
       instructor: { select: { name: true } },
       _count: { select: { enrollments: true } },
+      enrollments: { where: { studentId: user.id }, select: { accessExpiresAt: true } },
     },
   });
 
@@ -67,8 +70,13 @@ export default async function ClassesPage() {
         {classes.map((klass) => (
           <Link key={klass.id} href={`/classes/${klass.id}`}>
             <Card className="h-full transition-colors hover:bg-accent/50">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-start justify-between space-y-0">
                 <CardTitle className="text-base">{klass.name}</CardTitle>
+                {user.role === Role.STUDENT &&
+                  klass.enrollments[0] &&
+                  !isEnrollmentActive(klass.enrollments[0]) && (
+                    <Badge variant="destructive">Access expired</Badge>
+                  )}
               </CardHeader>
               <CardContent className="space-y-1 text-sm text-muted-foreground">
                 <p>{klass.course.title}</p>

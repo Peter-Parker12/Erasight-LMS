@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { getStudentDashboardData } from "@/lib/dashboard";
+import { isEnrollmentActive } from "@/lib/access";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RecentMaterials } from "./recent-materials";
@@ -29,7 +30,12 @@ export async function StudentDashboard({ studentId }: { studentId: string }) {
               <span>
                 {c.courseTitle} — {c.className}
               </span>
-              <Badge variant="secondary">{c.status}</Badge>
+              <span className="flex gap-1.5">
+                <Badge variant="secondary">{c.status}</Badge>
+                {c.accessExpiresAt && !isEnrollmentActive(c) && (
+                  <Badge variant="destructive">Access expired</Badge>
+                )}
+              </span>
             </Link>
           ))}
         </CardContent>

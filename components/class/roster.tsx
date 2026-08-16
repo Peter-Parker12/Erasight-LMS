@@ -1,10 +1,12 @@
 "use client";
 
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAction } from "next-safe-action/hooks";
 import { UserMinus } from "lucide-react";
 
 import { removeEnrollment } from "@/actions/enrollment";
+import { isEnrollmentActive } from "@/lib/access";
 import { ConfirmIconButton } from "@/components/confirm-icon-button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +23,7 @@ export type RosterEntry = {
   name: string;
   email: string;
   status: string;
+  accessExpiresAt: Date | null;
 };
 
 export function Roster({ entries, canManage }: { entries: RosterEntry[]; canManage: boolean }) {
@@ -47,8 +50,14 @@ export function Roster({ entries, canManage }: { entries: RosterEntry[]; canMana
           <TableRow key={entry.enrollmentId}>
             <TableCell>{entry.name}</TableCell>
             <TableCell className="text-muted-foreground">{entry.email}</TableCell>
-            <TableCell>
+            <TableCell className="space-x-1.5">
               <Badge variant="secondary">{entry.status}</Badge>
+              {entry.accessExpiresAt && !isEnrollmentActive(entry) && (
+                <Badge variant="destructive">Expired</Badge>
+              )}
+              {entry.accessExpiresAt && isEnrollmentActive(entry) && (
+                <Badge variant="outline">Expires {format(entry.accessExpiresAt, "MMM d, yyyy")}</Badge>
+              )}
             </TableCell>
             {canManage && (
               <TableCell>

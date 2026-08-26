@@ -17,8 +17,12 @@ RUN git clone --depth=1 --branch MOODLE_405_STABLE https://github.com/moodle/moo
 FROM php:8.3-apache AS runtime
 WORKDIR /var/www/html
 
-# Build deps for the PHP extensions below, removed after install to keep the
-# image lean.
+# Build deps for the PHP extensions below. Purged after install to drop
+# headers/build tools, but WITHOUT --auto-remove: that flag cascades into
+# removing the runtime shared libraries (libpq.so.5, libicu*, libpng16,
+# libzip, libexslt) that the compiled .so extensions dlopen() at startup,
+# since apt sees nothing left depending on them once the -dev packages are
+# gone — that broke pgsql/intl/pdo_pgsql/xsl/zip/gd loading on first deploy.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libpq-dev libicu-dev libxml2-dev libzip-dev libsodium-dev \
       libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
@@ -26,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
       pgsql pdo_pgsql intl xml zip sodium gd soap xsl opcache mbstring exif \
-    && apt-get purge -y --auto-remove libpq-dev libicu-dev libxml2-dev libzip-dev \
+    && apt-get purge -y libpq-dev libicu-dev libxml2-dev libzip-dev \
       libsodium-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libxslt1-dev \
       libonig-dev \
     && rm -rf /var/lib/apt/lists/*

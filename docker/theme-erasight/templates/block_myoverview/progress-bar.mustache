@@ -1,0 +1,18 @@
+{{!
+    Erasight override of block_myoverview/progress-bar. The stock template
+    (verified against MOODLE_405_STABLE) renders progress as plain text only
+    — "62% complete", no visual bar at all — so this adds an actual bar
+    while keeping the same sr-only text for accessibility.
+}}
+<div class="erasight-progress">
+    <div class="progress erasight-progress-track">
+        <div class="progress-bar erasight-progress-fill" role="progressbar"
+            style="width: {{progress}}%"
+            aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+    <div class="progress-text erasight-progress-text">
+        <span class="sr-only">{{#str}}aria:courseprogress, block_myoverview{{/str}}</span>
+        {{#str}}completepercent, block_myoverview, <span>{{progress}}</span>{{/str}}
+    </div>
+</div>

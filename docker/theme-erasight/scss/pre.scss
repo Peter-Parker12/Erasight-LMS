@@ -1,0 +1,24 @@
+// Loaded BEFORE Bootstrap compiles (theme_boost_get_pre_scss) — these are
+// Sass variables, not CSS, so they reach every Bootstrap component Moodle's
+// admin screens are built from (buttons, forms, tables, alerts) automatically.
+//
+// $primary is deliberately a neutral near-black, not a brand accent: it's
+// what every admin "Save changes" button site-wide inherits, and the old
+// custom LMS (a shadcn/ui "New York" build) used the same near-black default
+// rather than a colored primary button. Brand accents (sky/ember from the
+// logo) live as CSS custom properties in post.scss instead, so later phases
+// can apply them selectively to student-facing templates (course cards,
+// progress bars) without recoloring every form control in Site administration.
+$primary:          #241708;
+$body-bg:          #FBF9F6;
+$body-color:       #241708;
+$link-color:       #0D7FA4;
+$success:          #1E8E5A;
+$warning:          #B7791F;
+$danger:           #C0392B;
+
+$border-radius:     .625rem;
+$border-radius-sm:  .5rem;
+$border-radius-lg:  .875rem;
+
+$font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;

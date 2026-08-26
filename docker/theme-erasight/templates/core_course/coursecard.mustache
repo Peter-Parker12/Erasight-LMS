@@ -1,0 +1,53 @@
+{{!
+    Erasight override of core_course/coursecard (verified against the real
+    file on MOODLE_405_STABLE before touching it — course/templates/coursecard.mustache).
+
+    Keeps the same data-region/data-course-id/id attributes the JS in
+    blocks/myoverview/amd relies on, and keeps the same four override slots
+    the base template defines ({{$coursename}}, {{$coursecategory}},
+    {{$progress}}, {{$menu}}) in the same names so
+    block_myoverview/view-cards.mustache's own overrides of those slots
+    keep landing correctly — only the surrounding markup moved.
+
+    Note: Moodle has no native rating/enrolled-count/duration data for a
+    course, so this card doesn't invent any — those were mockup flourishes,
+    not real Moodle fields.
+}}
+<div class="card course-card erasight-course-card mx-1" role="listitem"
+    data-region="course-content"
+    data-course-id="{{{id}}}">
+    <a href="{{viewurl}}" tabindex="-1">
+        <div class="card-img-top erasight-thumb" style='background-image: url("{{{courseimage}}}");'>
+            <span class="sr-only">{{fullname}}</span>
+            <div class="erasight-cat-chip">
+                {{$coursecategory}}{{/coursecategory}}
+            </div>
+        </div>
+    </a>
+    <div class="card-body pe-1 course-info-container erasight-card-body" id="course-info-container-{{id}}-{{uniqid}}">
+        {{#showshortname}}
+            <div class="text-muted muted d-flex mb-1 flex-wrap">
+                <span class="sr-only">
+                    {{#str}}aria:courseshortname, core_course{{/str}}
+                </span>
+                <div>{{{shortname}}}</div>
+            </div>
+        {{/showshortname}}
+        <a href="{{viewurl}}" class="aalink coursename erasight-coursename">
+            {{> core_course/favouriteicon }}
+            <span class="sr-only">
+                {{#str}}aria:coursename, core_course{{/str}}
+            </span>
+            {{$coursename}}{{/coursename}}
+        </a>
+        {{^visible}}
+            <div class="d-flex flex-wrap">
+                <span class="badge bg-info text-white">{{#str}} hiddenfromstudents {{/str}}</span>
+            </div>
+        {{/visible}}
+    </div>
+    <div class="erasight-card-foot">
+        {{$progress}}{{/progress}}
+        {{$menu}}{{/menu}}
+    </div>
+</div>

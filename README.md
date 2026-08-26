@@ -13,6 +13,15 @@ This replaced an earlier custom-built Next.js LMS (see git history before the Mo
 
 Public access is via **Cloudflare Tunnel** (`cloudflared`), run separately on the VPS — not part of this Compose stack. Its ingress rule points at `http://localhost:5895`.
 
+## Theme
+
+`docker/theme-erasight/` is a custom theme (a child of Boost — never edits Moodle core), baked into the image at `theme/erasight` and set as the site default via `$CFG->theme` in `config.php`. It's being built in phases:
+
+1. **Brand tokens** (done) — palette, Inter/Bricolage Grotesque/JetBrains Mono, radius — applied globally via `scss/pre.scss` and `scss/post.scss`, which reskins every admin screen for free since Moodle's admin UI inherits the active theme.
+2. **Dashboard course cards** (done) — overrides `core_course/coursecard.mustache` and `block_myoverview/progress-bar.mustache` (Moodle's own progress display is plain text with no visual bar) for the "My courses" (`/my/`) dashboard. Discovered along the way: the separate "browse all courses" category/search page (`course/renderer.php`'s `coursecat_coursebox_content()`) is built with raw PHP `html_writer` calls, not Mustache templates at all — this override doesn't reach it. Reskinning that page means subclassing `core_course_renderer` in the theme, a materially bigger task than a template override, not yet started.
+3. In-course player (sidebar curriculum + video pane) — the highest-risk phase, touches how course content renders, not yet built.
+4. Admin polish pass on top of phase 1's base tokens.
+
 ## Deploy
 
 ```bash

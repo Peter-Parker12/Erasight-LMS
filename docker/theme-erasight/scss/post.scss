@@ -1,0 +1,112 @@
+// Loaded AFTER Bootstrap compiles (theme_boost_get_extra_scss). This is a
+// real Docker deployment serving real browsers, not the sandboxed artifact
+// preview — an external @import for Google Fonts works normally here.
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --erasight-sky: #1FAEDD;
+  --erasight-sky-deep: #0D7FA4;
+  --erasight-sky-tint: #E4F6FC;
+  --erasight-ember: #E85D04;
+  --erasight-ember-tint: #FDE7D6;
+  --erasight-umber: #241708;
+  --erasight-mist: #F3EFE9;
+  --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
+  --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+h1, h2, .navbar-brand {
+  font-family: var(--erasight-font-display);
+}
+
+// Phase 2 — course cards, verified against core_course/coursecard.mustache
+// and block_myoverview/progress-bar.mustache before overriding either.
+// Applies wherever core_course/coursecard renders (the "My courses" /
+// block_myoverview dashboard confirmed; course/renderer.php's category
+// browse & search pages use an older, non-template coursebox renderer this
+// doesn't reach — see the phase notes in README.md).
+.erasight-course-card {
+  border-color: var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: transform .15s ease, box-shadow .15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -16px rgba(36, 23, 8, .25);
+  }
+}
+
+.erasight-thumb {
+  position: relative;
+  height: 110px;
+  background-color: var(--erasight-mist);
+  background-size: cover;
+  background-position: center;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(36, 23, 8, 0) 55%, rgba(36, 23, 8, .35));
+  }
+}
+
+.erasight-cat-chip {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 1;
+
+  .categoryname {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #fff;
+    background: rgba(36, 23, 8, .55);
+    backdrop-filter: blur(2px);
+    border-radius: 999px;
+    padding: .2rem .6rem;
+  }
+}
+
+.erasight-card-body {
+  padding-top: .85rem;
+}
+
+.erasight-coursename {
+  font-weight: 700;
+  color: var(--erasight-umber);
+}
+
+.erasight-card-foot {
+  display: flex;
+  align-items: center;
+  padding: 0 .75rem .75rem;
+  gap: .5rem;
+}
+
+.erasight-progress {
+  flex: 1;
+  min-width: 0;
+}
+
+.erasight-progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--erasight-mist);
+  margin-bottom: .3rem;
+}
+
+.erasight-progress-fill {
+  background: linear-gradient(90deg, var(--erasight-sky), var(--erasight-ember));
+  border-radius: 999px;
+}
+
+.erasight-progress-text {
+  font-size: .72rem;
+  color: var(--erasight-sky-deep);
+  font-weight: 600;
+}

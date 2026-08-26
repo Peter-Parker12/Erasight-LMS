@@ -29,6 +29,15 @@ else
   echo "install_database.php exited non-zero — see output above for whether this was the expected 'already installed' case or a real error."
 fi
 
+# Registers any plugin added to the image since the last deploy (theme_erasight,
+# local_erasight, ...) — a fresh install_database.php run above already picks up
+# whatever plugins exist at that moment, but an EXISTING site needs this
+# separate step to notice new plugin directories. Verified against
+# admin/cli/upgrade.php on MOODLE_405_STABLE: with nothing pending it exits 0
+# (not an error), so this is safe to run on every startup, not just once.
+php admin/cli/upgrade.php --non-interactive
+echo "Plugin upgrade check complete."
+
 # Outgoing mail — reuses the same Gmail App Password already set up for the
 # Next.js app's invitation emails. admin/cli/cfg.php is idempotent (no-ops if
 # the value is already set), so this always runs, not just on first install.

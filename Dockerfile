@@ -39,10 +39,11 @@ COPY docker/php-moodle.ini /usr/local/etc/php/conf.d/zz-moodle.ini
 RUN a2enmod rewrite
 
 COPY --from=fetch /src /var/www/html
-# Our theme is a plugin, not a core edit — added into the freshly-cloned
-# theme/ directory rather than committed to the fetch stage's checkout, so
-# it survives every future MOODLE_405_STABLE re-clone unchanged.
+# Our theme and the catalog page are plugins, not core edits — added into
+# the freshly-cloned tree rather than committed to the fetch stage's
+# checkout, so they survive every future MOODLE_405_STABLE re-clone unchanged.
 COPY docker/theme-erasight /var/www/html/theme/erasight
+COPY docker/local-erasight /var/www/html/local/erasight
 COPY docker/config.php /var/www/html/config.php
 COPY docker/install-database.sh /usr/local/bin/install-database.sh
 COPY docker/cron-loop.sh /usr/local/bin/cron-loop.sh

@@ -110,3 +110,101 @@ h1, h2, .navbar-brand {
   color: var(--erasight-sky-deep);
   font-weight: 600;
 }
+
+// Phase 3 — in-course "cinema mode", SCSS-only, no template overrides.
+//
+// Deliberately doesn't touch course/format/templates/local/content (the
+// activity/section list in the main pane) or attempt a custom video player —
+// Moodle has no single "video" concept to hook (a mod_page, mod_url, H5P
+// activity, or embedded iframe are all rendered completely differently), so
+// a universal player chrome isn't something a theme can honestly apply.
+//
+// What IS real and verified: core_courseformat/local/courseindex is a
+// genuine template-based component (course/format/templates/local/
+// courseindex/*.mustache, fetched from source before styling it), not the
+// legacy html_writer renderer phase 2 had to work around — restyling its
+// existing, real class names is pure CSS, no new PHP/templates, lowest risk
+// of any phase so far. `.pagelayout-course` is Moodle's standard body class
+// for course/view.php (confirmed via its set_pagelayout('course') call).
+body.pagelayout-course {
+  background: var(--erasight-umber);
+
+  #courseindex {
+    background: var(--erasight-umber);
+    border-color: rgba(255, 255, 255, .08);
+  }
+
+  .courseindex-section {
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+  }
+
+  .courseindex-item-content {
+    background: rgba(0, 0, 0, .15);
+  }
+
+  .courseindex-section-title .courseindex-link {
+    font-family: var(--erasight-font-display);
+    font-weight: 700;
+    color: #fff;
+    text-transform: none;
+  }
+
+  .courseindex-chevron {
+    color: rgba(255, 255, 255, .6);
+  }
+
+  li.courseindex-item .courseindex-link {
+    color: rgba(255, 255, 255, .75);
+  }
+
+  // The active course-module (current activity) — closest equivalent to the
+  // mockup's "current lesson" highlight in the curriculum sidebar.
+  li.courseindex-item.active {
+    background: rgba(31, 174, 221, .14);
+    box-shadow: inset 3px 0 0 var(--erasight-sky);
+
+    .courseindex-link {
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+
+  .courseindex-section.current > .courseindex-item .courseindex-link {
+    color: var(--erasight-sky);
+  }
+
+  .current-badge {
+    background: var(--erasight-ember) !important;
+  }
+}
+
+// Phase 4 — admin polish, on top of phase 1's tokens. Deliberately scoped to
+// .generaltable and .generalbox: these are Moodle's own long-standing,
+// near-universal conventions (participants, course management, logs, every
+// admin listing) rather than guessed-at page-specific markup, so this stays
+// low-risk the same way phase 1 did.
+.generaltable {
+  border-color: var(--erasight-mist);
+
+  th {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--erasight-umber);
+    opacity: .65;
+    border-bottom-width: 1px;
+  }
+
+  tbody tr:hover {
+    background: var(--erasight-mist);
+  }
+}
+
+.generalbox {
+  border-color: var(--erasight-mist);
+  border-radius: $border-radius-lg;
+}
+
+.badge.bg-success { background-color: #1E8E5A !important; }
+.badge.bg-warning { background-color: #B7791F !important; }
+.badge.bg-danger  { background-color: #C0392B !important; }

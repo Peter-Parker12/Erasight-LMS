@@ -32,6 +32,12 @@ $CFG->wwwroot  = getenv('NEXT_PUBLIC_APP_URL') ?: 'http://localhost';
 $CFG->dataroot = '/var/moodledata';
 $CFG->admin    = 'admin';
 
+// Cloudflare Tunnel terminates HTTPS at the edge and forwards plain HTTP to
+// this container — without sslproxy, Moodle sees an HTTP request against an
+// https:// wwwroot, decides the scheme is wrong, and redirect-loops trying
+// to "fix" it (visible as endless 303s to / in the moodle service's logs).
+$CFG->sslproxy = true;
+
 $CFG->directorypermissions = 0755;
 
 require_once(__DIR__ . '/lib/setup.php');

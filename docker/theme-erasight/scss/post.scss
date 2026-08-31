@@ -208,3 +208,97 @@ body.pagelayout-course {
 .badge.bg-success { background-color: #1E8E5A !important; }
 .badge.bg-warning { background-color: #B7791F !important; }
 .badge.bg-danger  { background-color: #C0392B !important; }
+
+// Phase 5 — admin home tile grid (local_erasight/adminhome.php). Reuses the
+// .generalbox convention from phase 4 for group containers and phase 1's
+// --erasight-* tokens; this is a plugin-owned template, not a core override,
+// so there was no existing markup/classes to verify against — the class
+// names below are ours end to end.
+.erasight-admin-home {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 900px;
+}
+
+.erasight-tile-group {
+  padding: 1.25rem;
+}
+
+.erasight-tile-group-title {
+  font-family: var(--erasight-font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--erasight-umber);
+  margin-bottom: .9rem;
+}
+
+.erasight-stat-row {
+  display: flex;
+  gap: .9rem;
+  flex-wrap: wrap;
+}
+
+.erasight-stat {
+  background: var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  padding: .9rem 1.1rem;
+  min-width: 140px;
+}
+
+.erasight-stat-value {
+  font-family: var(--erasight-font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--erasight-umber);
+  line-height: 1;
+}
+
+.erasight-stat-label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--erasight-umber);
+  opacity: .65;
+  margin-top: .3rem;
+}
+
+.erasight-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: .9rem;
+}
+
+.erasight-tile {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: 1rem;
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  text-decoration: none;
+  color: var(--erasight-umber);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -16px rgba(36, 23, 8, .25);
+    border-color: var(--erasight-sky-deep);
+    color: var(--erasight-umber);
+    text-decoration: none;
+  }
+}
+
+.erasight-tile-icon {
+  color: var(--erasight-sky-deep);
+}
+
+.erasight-tile-label {
+  font-weight: 700;
+}
+
+.erasight-tile-desc {
+  font-size: .8rem;
+  color: var(--erasight-umber);
+  opacity: .65;
+}

@@ -1,0 +1,48 @@
+{{!
+    @template local_erasight/adminhome
+
+    Tile-grid admin landing page. This is new plugin-owned markup, not a
+    core template being reskinned, so it lives here rather than under
+    theme_erasight/templates.
+
+    Example context (json):
+    {
+        "overviewtitle": "Overview",
+        "stats": [ {"value": 48, "label": "Courses"} ],
+        "groups": [
+            {
+                "title": "Manage",
+                "tiles": [
+                    {"url": "#", "label": "Course & category management", "description": "...", "icon": "i/course"}
+                ]
+            }
+        ]
+    }
+}}
+<div class="erasight-admin-home">
+    <section class="erasight-tile-group generalbox">
+        <h3 class="erasight-tile-group-title">{{overviewtitle}}</h3>
+        <div class="erasight-stat-row">
+            {{#stats}}
+            <div class="erasight-stat">
+                <div class="erasight-stat-value">{{value}}</div>
+                <div class="erasight-stat-label">{{label}}</div>
+            </div>
+            {{/stats}}
+        </div>
+    </section>
+    {{#groups}}
+    <section class="erasight-tile-group generalbox">
+        <h3 class="erasight-tile-group-title">{{title}}</h3>
+        <div class="erasight-tile-grid">
+            {{#tiles}}
+            <a class="erasight-tile" href="{{url}}">
+                <span class="erasight-tile-icon">{{#pix}} {{icon}}, core, {{label}} {{/pix}}</span>
+                <span class="erasight-tile-label">{{label}}</span>
+                <span class="erasight-tile-desc">{{description}}</span>
+            </a>
+            {{/tiles}}
+        </div>
+    </section>
+    {{/groups}}
+</div>

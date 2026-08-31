@@ -302,3 +302,92 @@ body.pagelayout-course {
   color: var(--erasight-umber);
   opacity: .65;
 }
+
+// Phase 6 — front-page hero. Rendered by theme_erasight/templates/hero.mustache
+// via the forked frontpage.php/frontpage.mustache layout (see README) — new,
+// theme-owned markup, not a core override.
+.erasight-hero {
+  background: radial-gradient(120% 160% at 15% 0%, var(--erasight-sky-deep), var(--erasight-umber) 70%);
+  color: #fff;
+  padding: 4rem 1.5rem;
+  margin: -1.5rem -1.5rem 1.5rem;
+}
+
+.erasight-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.erasight-hero-title {
+  font-family: var(--erasight-font-display);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 800;
+  margin-bottom: .75rem;
+}
+
+.erasight-hero-tagline {
+  font-size: 1.05rem;
+  opacity: .85;
+  margin-bottom: 1.75rem;
+}
+
+.erasight-hero-cta {
+  display: flex;
+  justify-content: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.erasight-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: .9rem;
+  padding: .7rem 1.4rem;
+  border-radius: $border-radius-lg;
+  text-decoration: none;
+  transition: transform .15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+}
+
+.erasight-hero-btn-primary {
+  background: var(--erasight-ember);
+  color: #fff;
+}
+
+.erasight-hero-btn-secondary {
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .35);
+  color: #fff;
+}
+
+.erasight-hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.erasight-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.erasight-hero-stat-value {
+  font-family: var(--erasight-font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.erasight-hero-stat-label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .75;
+}

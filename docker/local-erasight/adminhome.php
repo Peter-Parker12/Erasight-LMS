@@ -23,7 +23,16 @@ $PAGE->set_heading(get_string('adminhome', 'local_erasight'));
 
 $stats = [
     (object) ['value' => $DB->count_records('course') - 1, 'label' => get_string('stat_courses', 'local_erasight')],
-    (object) ['value' => $DB->count_records('user', ['deleted' => 0, 'confirmed' => 1]), 'label' => get_string('stat_users', 'local_erasight')],
+    (object) [
+        // Excludes the guest account by its real $CFG->siteguest id rather
+        // than a guessed-at offset — same fix as theme_erasight's hero stats.
+        'value' => $DB->count_records_select(
+            'user',
+            'deleted = 0 AND confirmed = 1 AND id != ?',
+            [$CFG->siteguest]
+        ),
+        'label' => get_string('stat_users', 'local_erasight'),
+    ],
 ];
 
 $groups = [

@@ -1,0 +1,37 @@
+{{!
+    @template theme_erasight/hero
+
+    The front-page hero banner. New, plugin/theme-owned markup — not a core
+    override, so there was nothing to verify markup against; only the data
+    (sitename, cta urls, stats) needed real Moodle APIs, all built in
+    layout/frontpage.php.
+
+    Example context (json):
+    {
+        "sitename": "Erasight LMS",
+        "tagline": "Internal training, built for how the team actually learns.",
+        "cta": {
+            "primaryurl": "#", "primarylabel": "Browse courses",
+            "secondaryurl": "#", "secondarylabel": "Log in"
+        },
+        "stats": [ {"value": 48, "label": "Courses"} ]
+    }
+}}
+<div class="erasight-hero">
+    <div class="erasight-hero-inner">
+        <h1 class="erasight-hero-title">{{sitename}}</h1>
+        <p class="erasight-hero-tagline">{{tagline}}</p>
+        <div class="erasight-hero-cta">
+            <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{cta.primaryurl}}">{{cta.primarylabel}}</a>
+            <a class="erasight-hero-btn erasight-hero-btn-secondary" href="{{cta.secondaryurl}}">{{cta.secondarylabel}}</a>
+        </div>
+        <div class="erasight-hero-stats">
+            {{#stats}}
+            <div class="erasight-hero-stat">
+                <span class="erasight-hero-stat-value">{{value}}</span>
+                <span class="erasight-hero-stat-label">{{label}}</span>
+            </div>
+            {{/stats}}
+        </div>
+    </div>
+</div>

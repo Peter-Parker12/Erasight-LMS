@@ -24,3 +24,19 @@ $THEME->iconsystem = \core\output\icon_system::FONTAWESOME;
 $THEME->haseditswitch = true;
 $THEME->usescourseindex = true;
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
+
+// Overrides ONLY the 'frontpage' layout — verified against
+// lib/classes/output/theme_config.php (the constructor cascades every OTHER
+// layout key straight from the parent when a child theme doesn't define it,
+// lines ~552-563), so 'course'/'admin'/'standard'/'mydashboard'/etc. are
+// untouched and still come from Boost exactly as before. Same regions/
+// options as Boost's own 'frontpage' entry — only 'file' differs, since that
+// file is what actually renders the hero banner (see layout/frontpage.php).
+$THEME->layouts = [
+    'frontpage' => [
+        'file' => 'frontpage.php',
+        'regions' => ['side-pre'],
+        'defaultregion' => 'side-pre',
+        'options' => ['nonavbar' => true],
+    ],
+];

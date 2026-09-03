@@ -32,6 +32,40 @@ All eight phases are now in place. Still open: a 502 was reported when creating 
 
 New plugins (theme or local) aren't picked up by an *existing* install the way a fresh `install_database.php` run picks up everything present at once — `docker/install-database.sh` now also runs `admin/cli/upgrade.php --non-interactive` on every `docker compose up` to register them (confirmed idempotent: exits 0 when nothing's pending, not an error).
 
+## CRM integration (Twenty CRM → Moodle account creation)
+
+Goal: when a lead converts in the (modified) Twenty CRM, an account gets created here automatically. Built on Moodle's official Web Services REST API, using its real `core_user_create_users` function (verified against `user/externallib.php`) rather than a custom endpoint — no new code in this repo has to be trusted with account creation.
+
+**What's automated** (`docker/install-database.sh` + `docker/local-erasight/db/services.php`):
+- `enablewebservices` and `webserviceprotocols=rest` are turned on idempotently on every `docker compose up`, same pattern as the SMTP settings.
+- A narrowly-scoped external service, **"Erasight CRM integration"** (shortname `erasight_crm_integration`), bundling only `core_user_create_users` — not a general-purpose API token. `restrictedusers => 1` means enabling it isn't enough by itself; a specific user still has to be explicitly authorised (next section).
+
+**What's manual, deliberately** (a token is a real secret — this repo doesn't generate or store one):
+1. Log in as admin → Site administration → Server → Web services → External services → find **Erasight CRM integration** → **Authorised users** → add a user for this integration to act as. Recommend a **dedicated account** with only the `moodle/user:create` capability at system level, not an existing admin — least privilege, and it makes the audit trail (who created a given account) clean.
+2. Site administration → Server → Web services → Manage tokens → create a new token for that user, scoped to the **Erasight CRM integration** service.
+3. Store that token wherever your Twenty CRM fork keeps its other API credentials.
+
+**What the CRM should call**, wherever its lead-conversion code path lives (not in this repo — that's the Twenty CRM fork's own codebase):
+
+```
+POST https://lms.erasight.net/webservice/rest/server.php
+Content-Type: application/x-www-form-urlencoded
+
+wstoken=<TOKEN>
+wsfunction=core_user_create_users
+moodlewsrestformat=json
+users[0][username]=<email, lowercased>
+users[0][firstname]=<lead first name>
+users[0][lastname]=<lead last name>
+users[0][email]=<lead email>
+users[0][auth]=manual
+users[0][createpassword]=1
+```
+
+- `createpassword=1` means Moodle generates the password itself and emails the new user a set-password link — the CRM never needs to invent or transmit a real password.
+- `username` must be unique. Using the lowercased email is the simplest reliable choice unless the CRM has a better natural key already.
+- **Not idempotent** — calling this twice for the same email throws `Username already exists` (confirmed in `user/externallib.php`). If the CRM's conversion trigger can fire more than once for the same lead (retries, re-conversion, etc.), that specific error response should be treated as "already handled," not a failure — worth handling on the CRM side since this repo doesn't own that code.
+
 ## Deploy
 
 ```bash

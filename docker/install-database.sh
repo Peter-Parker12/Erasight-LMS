@@ -51,3 +51,19 @@ if [ -n "${GMAIL_USER:-}" ] && [ -n "${GMAIL_APP_PASSWORD:-}" ]; then
 else
   echo "GMAIL_USER/GMAIL_APP_PASSWORD not set — skipping SMTP configuration."
 fi
+
+# Web services + REST protocol, for the CRM -> LMS account-creation
+# integration (local_erasight/db/services.php defines the actual scoped
+# service). Both are plain $CFG scalars — enablewebservices confirmed in
+# lib/classes/plugininfo/webservice.php, webserviceprotocols is the real
+# comma-separated config name that same file reads/writes. cfg.php is
+# idempotent, same as the SMTP settings above.
+#
+# This only turns the REST *transport* on — it does NOT create a token by
+# itself. A token is a real secret, so generating and authorising one stays
+# a manual step: Site administration > Server > Web services > External
+# services > "Erasight CRM integration" > Authorised users, then Manage
+# tokens. See README.md for the exact request format the CRM should call.
+php admin/cli/cfg.php --name=enablewebservices --set=1
+php admin/cli/cfg.php --name=webserviceprotocols --set=rest
+echo "Web services + REST protocol enabled."

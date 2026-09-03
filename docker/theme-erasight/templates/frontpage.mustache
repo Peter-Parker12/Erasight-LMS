@@ -4,10 +4,15 @@
     A near-copy of theme_boost/drawers.mustache (fetched and read in full
     from MOODLE_405_STABLE before writing this), used only by
     theme_erasight/layout/frontpage.php for the site front page. The only
-    difference from the original is the {{{ herohtml }}} line inserted just
-    before {{{ output.main_content }}} — everything else (drawers, nav,
-    header, footer) is unchanged so the front page keeps normal Moodle
-    chrome around the new hero banner.
+    difference from the original is the "herohtml" line inserted just
+    before the "output.main_content" region — everything else (drawers,
+    nav, header, footer) is unchanged so the front page keeps normal
+    Moodle chrome around the new hero banner.
+
+    NOTE: do not quote literal Mustache tags (double/triple braces) in this
+    comment block — Mustache comments close on the first "}}" they find, not
+    a matched/nested one, so any tag-like text here will truncate the
+    comment early and leak the remainder as literal page output.
 }}
 {{> theme_boost/head }}
 

@@ -67,3 +67,16 @@ fi
 php admin/cli/cfg.php --name=enablewebservices --set=1
 php admin/cli/cfg.php --name=webserviceprotocols --set=rest
 echo "Web services + REST protocol enabled."
+
+# Sets 'erasight' as the starting theme, but ONLY if no theme has ever been
+# explicitly set — covers both a genuinely fresh install AND this deploy's
+# own transition off the old $CFG->theme force in config.php (in that case
+# the DB's theme config was never populated either, since config.php always
+# won before now). Never overwrites a theme an admin has since picked via
+# Site administration > Appearance > Themes on a later `docker compose up`.
+# admin/cli/cfg.php in read mode exits 3 if the value has never been set,
+# 0 if it has — confirmed directly from the script's own source.
+if ! php admin/cli/cfg.php --name=theme >/dev/null 2>&1; then
+  php admin/cli/cfg.php --name=theme --set=erasight
+  echo "Theme was never explicitly set — defaulted to erasight."
+fi

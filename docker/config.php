@@ -32,11 +32,11 @@ $CFG->wwwroot  = getenv('NEXT_PUBLIC_APP_URL') ?: 'http://localhost';
 $CFG->dataroot = '/var/moodledata';
 $CFG->admin    = 'admin';
 
-// Forces the site-wide theme here rather than via the admin UI/CLI, so it's
-// idempotent by construction — no install-time state to manage, matches how
-// every other setting in this file works. theme/erasight is a child of Boost
-// (see its config.php) baked into the image alongside this file.
-$CFG->theme = 'erasight';
+// Deliberately NOT forcing $CFG->theme here: setting it in config.php always
+// wins over whatever's chosen in Site administration > Appearance > Themes,
+// silently disabling that UI. 'erasight' is set as the starting theme once,
+// at install time, in install-database.sh instead — same end result on a
+// fresh deploy, but an admin's later theme choice actually sticks.
 
 // Cloudflare Tunnel terminates HTTPS at the edge and forwards plain HTTP to
 // this container — without sslproxy, Moodle sees an HTTP request against an

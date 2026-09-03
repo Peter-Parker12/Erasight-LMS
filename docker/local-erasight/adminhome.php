@@ -21,6 +21,11 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('adminhome', 'local_erasight'));
 $PAGE->set_heading(get_string('adminhome', 'local_erasight'));
 
+$banner = (object) [
+    'greeting' => get_string('adminhome_greeting', 'local_erasight', fullname($USER)),
+    'tagline' => get_string('adminhome_tagline', 'local_erasight'),
+];
+
 $stats = [
     (object) ['value' => $DB->count_records('course') - 1, 'label' => get_string('stat_courses', 'local_erasight')],
     (object) [
@@ -85,6 +90,7 @@ $groups = [
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_erasight/adminhome', [
+    'banner' => $banner,
     'overviewtitle' => get_string('group_overview', 'local_erasight'),
     'stats' => $stats,
     'groups' => $groups,

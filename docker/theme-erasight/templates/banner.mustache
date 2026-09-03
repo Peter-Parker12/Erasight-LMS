@@ -1,0 +1,21 @@
+{{!
+    @template theme_erasight/banner
+
+    A small "Welcome back" style banner — the shared, simpler counterpart to
+    hero.mustache (which has CTA buttons and stats, meant for the front
+    page). Used by layout/mydashboard.php and layout/mycourses.php; the
+    Admin Home page inlines the same two fields directly in its own
+    template rather than including this one, since a plugin-owned template
+    including a template from a different component wasn't worth verifying
+    for a four-line block.
+
+    Example context (json):
+    {
+        "greeting": "Welcome back, Priya",
+        "tagline": "Pick up where you left off."
+    }
+}}
+<div class="erasight-banner">
+    <h2 class="erasight-banner-title">{{greeting}}</h2>
+    <p class="erasight-banner-tagline">{{tagline}}</p>
+</div>

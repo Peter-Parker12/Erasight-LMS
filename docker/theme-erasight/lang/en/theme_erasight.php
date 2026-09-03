@@ -12,3 +12,8 @@ $string['hero_primary_loggedout'] = 'Browse courses';
 $string['hero_secondary_loggedout'] = 'Log in';
 $string['hero_stat_courses'] = 'Courses';
 $string['hero_stat_users'] = 'Teammates learning';
+
+$string['dashboard_greeting'] = 'Welcome back, {$a}';
+$string['dashboard_tagline'] = 'Pick up where you left off.';
+$string['mycourses_greeting'] = 'Your courses';
+$string['mycourses_tagline'] = 'Everything you\'re enrolled in, one click away.';

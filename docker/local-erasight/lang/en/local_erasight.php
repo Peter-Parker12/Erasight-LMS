@@ -5,6 +5,8 @@ $string['pluginname'] = 'Erasight';
 $string['catalog'] = 'Course catalog';
 
 $string['adminhome'] = 'Admin Home';
+$string['adminhome_greeting'] = 'Welcome back, {$a}';
+$string['adminhome_tagline'] = 'Everything you manage day to day, in one place.';
 $string['quicklinks'] = 'Erasight quick links';
 
 $string['group_overview'] = 'Overview';

@@ -2,14 +2,17 @@
 // Sass variables, not CSS, so they reach every Bootstrap component Moodle's
 // admin screens are built from (buttons, forms, tables, alerts) automatically.
 //
-// $primary is deliberately a neutral near-black, not a brand accent: it's
-// what every admin "Save changes" button site-wide inherits, and the old
-// custom LMS (a shadcn/ui "New York" build) used the same near-black default
-// rather than a colored primary button. Brand accents (sky/ember from the
-// logo) live as CSS custom properties in post.scss instead, so later phases
-// can apply them selectively to student-facing templates (course cards,
-// progress bars) without recoloring every form control in Site administration.
-$primary:          #241708;
+// $primary was originally a neutral near-black (matching the old app's
+// shadcn/ui default) specifically so Site administration stayed quiet/
+// neutral while only student-facing templates got the sky/ember brand
+// accents. That scope decision was later reversed: Home, Dashboard, My
+// courses, and Site administration are now explicitly meant to read as one
+// Udemy-styled brand too — so $primary is the ember accent, which recolors
+// every default Bootstrap primary button/focus-ring/active-nav-indicator
+// site-wide, admin included. Sky/ember remain available as CSS custom
+// properties in post.scss for anywhere a plain Bootstrap variable isn't
+// enough (course cards, progress bars, the hero banners).
+$primary:          #E85D04;
 $body-bg:          #FBF9F6;
 $body-color:       #241708;
 $link-color:       #0D7FA4;

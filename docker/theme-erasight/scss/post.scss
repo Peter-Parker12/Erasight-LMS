@@ -221,6 +221,31 @@ body.pagelayout-course {
   max-width: 900px;
 }
 
+// Phase 7 — Home/Dashboard/My courses/Site administration now explicitly
+// follow the same Udemy-styled brand, not just students. This banner is the
+// Site-administration-side counterpart to the front-page hero (same
+// gradient language, same tokens), scoped to our own Admin Home page —
+// which is why it's a smaller, contained addition rather than another
+// forked shared layout the way the front-page hero was.
+.erasight-banner {
+  background: radial-gradient(120% 160% at 15% 0%, var(--erasight-sky-deep), var(--erasight-umber) 70%);
+  color: #fff;
+  border-radius: $border-radius-lg;
+  padding: 1.75rem 1.5rem;
+}
+
+.erasight-banner-title {
+  font-family: var(--erasight-font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: .35rem;
+}
+
+.erasight-banner-tagline {
+  opacity: .85;
+  font-size: .95rem;
+}
+
 .erasight-tile-group {
   padding: 1.25rem;
 }

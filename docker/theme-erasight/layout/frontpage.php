@@ -75,6 +75,17 @@ $header = $PAGE->activityheader;
 $headercontent = $header->export_for_template($renderer);
 
 // --- Erasight addition starts here ---
+// $DB isn't in scope here the way it is in a normal top-level script: this
+// file is include()'d from inside a renderer method (not executed as a
+// standalone request), so only the specific globals that method itself
+// declares — $CFG, $SITE, $OUTPUT, $PAGE, $USER — are already available
+// above without a `global` statement, because Boost's original drawers.php
+// happened to already use exactly those and none of them needed declaring.
+// $DB was never part of that set since the original file never touched the
+// database — hence "Call to a member function count_records() on null"
+// once this code tried to use it without pulling in the real global first.
+global $DB;
+
 if (isloggedin() && !isguestuser()) {
     $herocta = (object) [
         'primaryurl' => (new moodle_url('/my/'))->out(false),

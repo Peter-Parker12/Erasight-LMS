@@ -2,23 +2,41 @@
 // Sass variables, not CSS, so they reach every Bootstrap component Moodle's
 // admin screens are built from (buttons, forms, tables, alerts) automatically.
 //
+// $erasight-dark is set by lib.php's theme_erasight_get_pre_scss(), reading
+// the theme_erasight/colorscheme admin setting (settings.php) — this file
+// doesn't read the setting directly, it's prepended as a plain Sass boolean
+// before this file's own content runs.
+//
 // $primary was originally a neutral near-black (matching the old app's
 // shadcn/ui default) specifically so Site administration stayed quiet/
 // neutral while only student-facing templates got the sky/ember brand
 // accents. That scope decision was later reversed: Home, Dashboard, My
 // courses, and Site administration are now explicitly meant to read as one
-// Udemy-styled brand too — so $primary is the ember accent, which recolors
-// every default Bootstrap primary button/focus-ring/active-nav-indicator
-// site-wide, admin included. Sky/ember remain available as CSS custom
-// properties in post.scss for anywhere a plain Bootstrap variable isn't
-// enough (course cards, progress bars, the hero banners).
-$primary:          #E85D04;
-$body-bg:          #FBF9F6;
-$body-color:       #241708;
-$link-color:       #0D7FA4;
-$success:          #1E8E5A;
-$warning:          #B7791F;
-$danger:           #C0392B;
+// Udemy-styled brand too — so $primary is the ember accent in both color
+// schemes, which recolors every default Bootstrap primary button/focus-ring/
+// active-nav-indicator site-wide, admin included.
+$primary: #E85D04;
+
+@if $erasight-dark {
+  // Reuses the exact dark palette already designed (and shipped) for the
+  // in-course "cinema mode" sidebar in post.scss's phase 3 — same colors,
+  // now applied site-wide instead of just course pages.
+  $body-bg:    #14181D;
+  $body-color: #D9DEE5;
+  // Sky-deep (#0D7FA4) was tuned for contrast against a near-white page;
+  // on a near-black one the brighter --erasight-sky reads far more legibly
+  // as a link color, matching what cinema mode already uses for the same
+  // reason.
+  $link-color: #1FAEDD;
+} @else {
+  $body-bg:    #FBF9F6;
+  $body-color: #241708;
+  $link-color: #0D7FA4;
+}
+
+$success: #1E8E5A;
+$warning: #B7791F;
+$danger:  #C0392B;
 
 $border-radius:     .625rem;
 $border-radius-sm:  .5rem;

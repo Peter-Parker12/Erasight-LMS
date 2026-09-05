@@ -25,6 +25,10 @@ $THEME->haseditswitch = true;
 $THEME->usescourseindex = true;
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 
+// Enables settings.php, which defines the light/dark color-scheme setting
+// lib.php's SCSS callbacks read (theme_erasight_is_dark()).
+$THEME->hassettings = true;
+
 // Overrides ONLY these three layout keys — verified against
 // lib/classes/output/theme_config.php (the constructor cascades every OTHER
 // layout key straight from the parent when a child theme doesn't define it,

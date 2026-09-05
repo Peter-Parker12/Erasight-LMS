@@ -3,16 +3,51 @@
 // preview — an external @import for Google Fonts works normally here.
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-:root {
-  --erasight-sky: #1FAEDD;
-  --erasight-sky-deep: #0D7FA4;
-  --erasight-sky-tint: #E4F6FC;
-  --erasight-ember: #E85D04;
-  --erasight-ember-tint: #FDE7D6;
-  --erasight-umber: #241708;
-  --erasight-mist: #F3EFE9;
-  --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
-  --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+// $erasight-dark is set by lib.php's theme_erasight_get_extra_scss(),
+// reading the theme_erasight/colorscheme admin setting (settings.php),
+// prepended as a plain Sass boolean before this file's own content runs —
+// same mechanism as pre.scss.
+//
+// --erasight-umber stays a FIXED value in both color schemes on purpose:
+// it's the anchor color of the hero/banner gradients (.erasight-hero,
+// .erasight-banner) and of the in-course "cinema mode" background
+// (body.pagelayout-course below), all of which are already deliberately
+// dark bands even when the rest of the site is light — nothing about them
+// should change when the site-wide scheme flips. --erasight-ink is the new
+// token that actually carries the TEXT-color role that --erasight-umber
+// used to double as; --erasight-mist and --erasight-sky-deep flip their
+// values (not just get new names) so every existing rule using them
+// automatically adapts without being individually rewritten.
+@if $erasight-dark {
+  :root {
+    --erasight-sky: #1FAEDD;
+    --erasight-sky-deep: #1FAEDD; // brighter than the light-mode value — legible against a near-black page, same reasoning as $link-color in pre.scss.
+    --erasight-sky-tint: rgba(31, 174, 221, .16);
+    --erasight-ember: #E85D04;
+    --erasight-ember-tint: rgba(232, 93, 4, .18);
+    --erasight-umber: #241708;
+    --erasight-ink: #D9DEE5;
+    --erasight-mist: #2A313B;
+    --erasight-surface: #1B2028;
+    --erasight-bg: #14181D;
+    --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
+    --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+} @else {
+  :root {
+    --erasight-sky: #1FAEDD;
+    --erasight-sky-deep: #0D7FA4;
+    --erasight-sky-tint: #E4F6FC;
+    --erasight-ember: #E85D04;
+    --erasight-ember-tint: #FDE7D6;
+    --erasight-umber: #241708;
+    --erasight-ink: #241708;
+    --erasight-mist: #F3EFE9;
+    --erasight-surface: #FFFFFF;
+    --erasight-bg: #FBF9F6;
+    --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
+    --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
 }
 
 h1, h2, .navbar-brand {
@@ -26,6 +61,7 @@ h1, h2, .navbar-brand {
 // browse & search pages use an older, non-template coursebox renderer this
 // doesn't reach — see the phase notes in README.md).
 .erasight-course-card {
+  background: var(--erasight-surface);
   border-color: var(--erasight-mist);
   border-radius: $border-radius-lg;
   overflow: hidden;
@@ -78,7 +114,7 @@ h1, h2, .navbar-brand {
 
 .erasight-coursename {
   font-weight: 700;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
 }
 
 .erasight-card-foot {
@@ -126,6 +162,10 @@ h1, h2, .navbar-brand {
 // existing, real class names is pure CSS, no new PHP/templates, lowest risk
 // of any phase so far. `.pagelayout-course` is Moodle's standard body class
 // for course/view.php (confirmed via its set_pagelayout('course') call).
+//
+// Uses --erasight-umber directly (not --erasight-bg/--erasight-ink) since
+// this band is deliberately always this exact dark regardless of the
+// site-wide color scheme — see the note above the @if block.
 body.pagelayout-course {
   background: var(--erasight-umber);
 
@@ -190,7 +230,7 @@ body.pagelayout-course {
     font-size: .72rem;
     text-transform: uppercase;
     letter-spacing: .04em;
-    color: var(--erasight-umber);
+    color: var(--erasight-ink);
     opacity: .65;
     border-bottom-width: 1px;
   }
@@ -201,6 +241,7 @@ body.pagelayout-course {
 }
 
 .generalbox {
+  background: var(--erasight-surface);
   border-color: var(--erasight-mist);
   border-radius: $border-radius-lg;
 }
@@ -254,7 +295,7 @@ body.pagelayout-course {
   font-family: var(--erasight-font-display);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
   margin-bottom: .9rem;
 }
 
@@ -275,7 +316,7 @@ body.pagelayout-course {
   font-family: var(--erasight-font-mono);
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
   line-height: 1;
 }
 
@@ -283,7 +324,7 @@ body.pagelayout-course {
   font-size: .72rem;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
   opacity: .65;
   margin-top: .3rem;
 }
@@ -302,14 +343,14 @@ body.pagelayout-course {
   border: 1px solid var(--erasight-mist);
   border-radius: $border-radius-lg;
   text-decoration: none;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 30px -16px rgba(36, 23, 8, .25);
     border-color: var(--erasight-sky-deep);
-    color: var(--erasight-umber);
+    color: var(--erasight-ink);
     text-decoration: none;
   }
 }
@@ -324,7 +365,7 @@ body.pagelayout-course {
 
 .erasight-tile-desc {
   font-size: .8rem;
-  color: var(--erasight-umber);
+  color: var(--erasight-ink);
   opacity: .65;
 }
 

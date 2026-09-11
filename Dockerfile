@@ -14,6 +14,14 @@ WORKDIR /src
 # MOODLE_405_STABLE = the 4.5.x LTS branch (supported through Oct 2027).
 RUN git clone --depth=1 --branch MOODLE_405_STABLE https://github.com/moodle/moodle.git .
 
+# webservice_mcp: a third-party (not Moodle core, not ours) plugin exposing
+# Moodle's external services as an MCP server for AI assistants — cloned
+# fresh here rather than vendored into this repo, same reasoning as Moodle
+# core itself above. onbirdev/moodle-webservice_mcp confirmed as the
+# canonical, actively-maintained repo (15 stars, most recent pushed_at) vs.
+# the one other fork on GitHub, which has zero commits beyond it.
+RUN git clone --depth=1 https://github.com/onbirdev/moodle-webservice_mcp.git /src-webservice-mcp
+
 FROM php:8.3-apache AS runtime
 WORKDIR /var/www/html
 
@@ -44,6 +52,7 @@ COPY --from=fetch /src /var/www/html
 # checkout, so they survive every future MOODLE_405_STABLE re-clone unchanged.
 COPY docker/theme-erasight /var/www/html/theme/erasight
 COPY docker/local-erasight /var/www/html/local/erasight
+COPY --from=fetch /src-webservice-mcp /var/www/html/webservice/mcp
 COPY docker/config.php /var/www/html/config.php
 COPY docker/install-database.sh /usr/local/bin/install-database.sh
 COPY docker/cron-loop.sh /usr/local/bin/cron-loop.sh

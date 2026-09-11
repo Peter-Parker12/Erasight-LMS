@@ -31,4 +31,19 @@ $services = [
         'downloadfiles' => 0,
         'uploadfiles' => 0,
     ],
+    // A separate service, not a reuse of the CRM one above, for the
+    // webservice_mcp plugin (cloned at build time, see Dockerfile) to
+    // expose to Claude — a distinct external consumer with its own
+    // token/audit trail, even though it starts out scoped to the exact
+    // same two already-verified functions. Add more function names here
+    // (verified against the relevant externallib.php first, per this
+    // repo's own standard) to give Claude more capability over the LMS.
+    'Erasight Claude integration' => [
+        'functions' => ['core_user_create_users', 'core_course_get_courses'],
+        'enabled' => 1,
+        'restrictedusers' => 1,
+        'shortname' => 'erasight_claude_integration',
+        'downloadfiles' => 0,
+        'uploadfiles' => 0,
+    ],
 ];

@@ -87,6 +87,25 @@ users[0][createpassword]=1
 
 This creates the *account* only — it does not enrol the student into any course. Enrolling into a specific course (e.g. whatever the lead converted for) would need a third call, `enrol_manual_enrol_users` (not yet added to the service) — say if that's wanted next.
 
+## Claude ↔ Moodle (MCP)
+
+Lets Claude (Claude Code, Claude Desktop, or claude.ai) query and manage this LMS directly from a chat, via [`webservice_mcp`](https://github.com/onbirdev/moodle-webservice_mcp) — a third-party but actively-maintained Moodle plugin (confirmed the canonical repo: 15 stars, most recently pushed, vs. one stale fork) that turns Moodle's own external services into a real MCP server. Cloned fresh at build time (see `Dockerfile`), same reasoning as Moodle core itself — not vendored into this repo.
+
+**What's automated**: the plugin itself (cloned + installed via the existing `admin/cli/upgrade.php` step), the `mcp` web service protocol (`webserviceprotocols=rest,mcp` in `install-database.sh`), and a scoped external service, **"Erasight Claude integration"** (shortname `erasight_claude_integration`, in `local_erasight/db/services.php`) — a separate service from the CRM's, its own token/audit trail, even though it starts scoped to the same two functions (`core_user_create_users`, `core_course_get_courses`). Add more function names to that array (verified against the relevant `externallib.php` first) to give Claude more capability later.
+
+**What's manual, deliberately** (same reasoning as the CRM integration — a token is a real secret):
+1. Site administration → Server → Web services → External services → **Erasight Claude integration** → Authorised users → add a dedicated account (not an existing admin).
+2. That account needs `webservice/mcp:use` granted, alongside the same `moodle/user:create` + `moodle/course:view` the CRM integration's account needs (same custom-role approach as before — see the CRM section above).
+3. Site administration → Server → Web services → Manage tokens → create a token for that user, scoped to **Erasight Claude integration**.
+
+**Connecting Claude Code to it**, once you have the token:
+
+```bash
+claude mcp add --transport http erasight-lms "https://lms.erasight.net/webservice/mcp/server.php?wstoken=<TOKEN>"
+```
+
+(Add `--scope user` if you want this available across every project, not just this one; default scope is local/this-project-only.) Verify with `claude mcp list`. The plugin also accepts the token as an `Authorization: Bearer <TOKEN>` header instead of a query parameter, if you'd rather not have it embedded in a URL — `claude mcp add --transport http erasight-lms https://lms.erasight.net/webservice/mcp/server.php --header "Authorization: Bearer <TOKEN>"`.
+
 ## Deploy
 
 ```bash

@@ -52,21 +52,25 @@ else
   echo "GMAIL_USER/GMAIL_APP_PASSWORD not set — skipping SMTP configuration."
 fi
 
-# Web services + REST protocol, for the CRM -> LMS account-creation
-# integration (local_erasight/db/services.php defines the actual scoped
-# service). Both are plain $CFG scalars — enablewebservices confirmed in
-# lib/classes/plugininfo/webservice.php, webserviceprotocols is the real
-# comma-separated config name that same file reads/writes. cfg.php is
-# idempotent, same as the SMTP settings above.
+# Web services + REST/MCP protocols. Both are plain $CFG scalars —
+# enablewebservices confirmed in lib/classes/plugininfo/webservice.php,
+# webserviceprotocols is the real comma-separated config name that same
+# file reads/writes (a list, not a single value — REST for the CRM
+# integration and MCP for Claude coexist here). cfg.php is idempotent, same
+# as the SMTP settings above. The webservice_mcp plugin itself (cloned at
+# build time, see Dockerfile) is registered by admin/cli/upgrade.php above,
+# same as any other new plugin.
 #
-# This only turns the REST *transport* on — it does NOT create a token by
-# itself. A token is a real secret, so generating and authorising one stays
-# a manual step: Site administration > Server > Web services > External
-# services > "Erasight CRM integration" > Authorised users, then Manage
-# tokens. See README.md for the exact request format the CRM should call.
+# This only turns the transports on — it does NOT create a token by itself.
+# A token is a real secret, so generating and authorising one stays a
+# manual step for both integrations: Site administration > Server > Web
+# services > External services > find the service ("Erasight CRM
+# integration" or "Erasight Claude integration") > Authorised users, then
+# Manage tokens. See README.md for exact request formats and the extra
+# webservice/mcp:use capability the MCP integration needs.
 php admin/cli/cfg.php --name=enablewebservices --set=1
-php admin/cli/cfg.php --name=webserviceprotocols --set=rest
-echo "Web services + REST protocol enabled."
+php admin/cli/cfg.php --name=webserviceprotocols --set=rest,mcp
+echo "Web services + REST/MCP protocols enabled."
 
 # Sets 'erasight' as the starting theme, but ONLY if no theme has ever been
 # explicitly set — covers both a genuinely fresh install AND this deploy's

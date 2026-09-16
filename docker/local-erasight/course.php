@@ -91,6 +91,30 @@ if ($editingteachers) {
     ];
 }
 
+// A simple, real-data heuristic (not a stored Moodle flag) — 60 days is a
+// display choice, not something Moodle tracks as "new" itself.
+$isnew = ($course->timecreated > time() - 60 * DAYSECS);
+
+// Only claim a certificate if the course actually contains a real
+// certificate-issuing activity — mod_certificate/mod_customcert are both
+// contrib, not core-bundled, so this must be detected, never assumed.
+$hascertificate = false;
+foreach ($modinfo->get_cms() as $cm) {
+    if (in_array($cm->modname, ['certificate', 'customcert'], true)) {
+        $hascertificate = true;
+        break;
+    }
+}
+
+$accesstext = null;
+if ($price) {
+    $accesstext = $price->enrolperiod > 0
+        ? get_string('accessperiod', 'local_erasight', format_time($price->enrolperiod))
+        : get_string('lifetimeaccess', 'local_erasight');
+}
+
+$customfields = local_erasight_get_course_customfields($course->id);
+
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_erasight/course', [
     'id' => $course->id,
@@ -106,5 +130,11 @@ echo $OUTPUT->render_from_template('local_erasight/course', [
     'instructor' => $instructor,
     'curriculum' => $curriculum,
     'lessoncount' => array_sum(array_map(fn($s) => count($s->items), $curriculum)),
+    'isnew' => $isnew,
+    'hascertificate' => $hascertificate,
+    'accesstext' => $accesstext,
+    'learncontent' => $customfields['erasight_learn'] ?? null,
+    'requirementscontent' => $customfields['erasight_requirements'] ?? null,
+    'faqcontent' => $customfields['erasight_faq'] ?? null,
 ]);
 echo $OUTPUT->footer();

@@ -769,3 +769,56 @@ body.pagelayout-course {
   font-size: .8rem;
   flex: none;
 }
+
+// Phase 11 — Course Details layout update: NEW badge, real "course
+// includes" facts (lesson count / access duration / certificate, all
+// derived from real data — see course.php), and the three optional
+// admin-authored sections (What you'll learn / Requirements / FAQ)
+// backed by real course custom fields.
+.erasight-cd-badge {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: .25rem .6rem;
+  border-radius: 999px;
+  margin-left: .4rem;
+}
+
+.erasight-cd-badge-new {
+  color: #fff;
+  background: var(--erasight-ember);
+}
+
+.erasight-buy-includes {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: .9rem 0 0;
+  border-top: 1px solid var(--erasight-mist);
+  font-size: .8rem;
+  opacity: .85;
+
+  li {
+    padding: .3rem 0;
+
+    &::before {
+      content: "✓";
+      color: var(--erasight-sky-deep);
+      font-weight: 700;
+      margin-right: .5rem;
+    }
+  }
+}
+
+.erasight-cd-learn ul, .erasight-cd-requirements ul, .erasight-cd-faq ul {
+  padding-left: 1.2rem;
+}
+
+.erasight-cd-learn, .erasight-cd-requirements, .erasight-cd-faq {
+  font-size: .88rem;
+  line-height: 1.7;
+  opacity: .85;
+  max-width: 64ch;
+  margin-bottom: 2rem;
+}

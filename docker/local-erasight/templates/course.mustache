@@ -2,25 +2,35 @@
     @template local_erasight/course
 
     The "Course Details" pre-purchase page. New, plugin-owned markup, not a
-    core override. Deliberately does NOT show ratings, enrolled-count, or a
-    "what you'll learn" bullet list the way the design mockup did — Moodle
-    has no native data for any of those, only real fields are rendered here.
+    core override. Deliberately does NOT show ratings, star reviews, or
+    named student testimonials the way the design reference did — Moodle
+    has no native subsystem backing any of those, and an admin manually
+    typing in a "4.8 stars" figure would misrepresent it as real aggregated
+    feedback. Only real (or real-and-admin-provided) data is rendered here.
 
-    Example context (json):
-    {
-        "id": 2, "fullname": "Docker & Kubernetes Fundamentals", "category": "Engineering",
-        "summary": "<p>...</p>", "courseimage": "#", "price": {"formatted": "$79.00"},
-        "enrolled": false, "viewurl": "#", "enrolurl": "#", "catalogurl": "#",
-        "instructor": {"fullname": "Duy Le"},
-        "curriculum": [ {"title": "Foundations", "items": [{"name": "Why containers"}]} ],
-        "lessoncount": 4
-    }
+    Context: id/fullname/category/summary/courseimage, price (object with
+    a formatted string, or absent), enrolled (bool), viewurl/enrolurl/
+    catalogurl, instructor (fullname/initials, or absent), curriculum
+    (array of title/items, each item a name) plus lessoncount, isnew
+    (bool, from course creation date), hascertificate (bool, only true
+    when the course contains a real certificate activity), accesstext
+    (a real access-duration string, or absent when there's no price yet),
+    and three optional admin-authored HTML blocks — learncontent,
+    requirementscontent, faqcontent — sourced from real course custom
+    fields (see local_erasight_get_course_customfields() in lib.php),
+    each section omitted entirely when its field is left blank.
+
+    NOTE: never write two closing-brace characters next to each other
+    anywhere in this comment block — a Mustache comment ends at the first
+    such occurrence it scans past, not a matched one, which is why this
+    comment is prose rather than a literal JSON/tag example.
 }}
 <div class="erasight-coursedetail">
     <div class="erasight-cd-hero" style='background-image: linear-gradient(180deg, rgba(36,23,8,.15), rgba(36,23,8,.75)), url("{{{courseimage}}}");'>
         <div class="erasight-cd-hero-inner">
             <div class="erasight-cd-crumb"><a href="{{catalogurl}}">{{#str}} catalog, local_erasight {{/str}}</a> / {{category}}</div>
             {{#category}}<span class="erasight-cd-cat">{{category}}</span>{{/category}}
+            {{#isnew}}<span class="erasight-cd-badge erasight-cd-badge-new">{{#str}} newbadge, local_erasight {{/str}}</span>{{/isnew}}
             <h1>{{fullname}}</h1>
             {{#curriculum}}<div class="erasight-cd-stats"><span>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</span></div>{{/curriculum}}
         </div>
@@ -41,6 +51,12 @@
                     <a class="erasight-buy-btn" href="{{enrolurl}}">{{#str}} enrolnow, local_erasight {{/str}}</a>
                 {{/enrolled}}
                 <div class="erasight-buy-secure">{{#str}} securecheckout, local_erasight {{/str}}</div>
+
+                <ul class="erasight-buy-includes">
+                    {{#curriculum}}<li>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</li>{{/curriculum}}
+                    {{#accesstext}}<li>{{accesstext}}</li>{{/accesstext}}
+                    {{#hascertificate}}<li>{{#str}} certificateofcompletion, local_erasight {{/str}}</li>{{/hascertificate}}
+                </ul>
             </div>
         </div>
     </div>
@@ -63,6 +79,21 @@
                 {{/curriculum}}
             </div>
             {{/curriculum}}
+
+            {{#learncontent}}
+            <h3>{{#str}} whatyoulllearn, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-learn">{{{learncontent}}}</div>
+            {{/learncontent}}
+
+            {{#requirementscontent}}
+            <h3>{{#str}} requirements, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-requirements">{{{requirementscontent}}}</div>
+            {{/requirementscontent}}
+
+            {{#faqcontent}}
+            <h3>{{#str}} faq, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-faq">{{{faqcontent}}}</div>
+            {{/faqcontent}}
         </div>
 
         {{#instructor}}

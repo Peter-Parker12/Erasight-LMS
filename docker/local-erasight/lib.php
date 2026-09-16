@@ -141,7 +141,36 @@ function local_erasight_get_course_price($courseid) {
             'cost' => (float) $instance->cost,
             'currency' => $instance->currency,
             'formatted' => \core_payment\helper::get_cost_as_string((float) $instance->cost, $instance->currency),
+            // Real per-instance setting (Enrolment methods -> Fee -> Enrolment
+            // duration), not a marketing claim — 0 genuinely means Moodle will
+            // never unenrol the student for time, i.e. real lifetime access.
+            'enrolperiod' => (int) $instance->enrolperiod,
         ];
     }
     return null;
+}
+
+// Course custom fields (Site administration -> Courses -> Custom fields,
+// provisioned automatically for this site by db/upgrade.php below) — the
+// real, admin-editable mechanism for "What you'll learn"/"Requirements"/
+// "FAQ" style content the storefront's reference design shows, since none
+// of that has a native Moodle course field. Returns only fields an admin
+// has actually filled in for this course (shortname => formatted HTML),
+// so a page section can be omitted entirely rather than shown empty.
+function local_erasight_get_course_customfields($courseid) {
+    $handler = \core_course\customfield\course_handler::create();
+    $fields = $handler->get_fields();
+    if (empty($fields)) {
+        return [];
+    }
+    $datas = \core_customfield\api::get_instance_fields_data($fields, $courseid);
+    $result = [];
+    foreach ($datas as $data) {
+        $value = $data->export_value();
+        if ($value === null || $value === '') {
+            continue;
+        }
+        $result[$data->get_field()->get('shortname')] = $value;
+    }
+    return $result;
 }

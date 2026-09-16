@@ -126,6 +126,69 @@ $herohtml = $OUTPUT->render_from_template('theme_erasight/hero', [
     'cta' => $herocta,
     'stats' => $herostats,
 ]);
+
+// Real courses (not mock data — same stable core_course_category API
+// catalog.php already uses) plus each course's real image/price via
+// local_erasight's helpers. Explicit require, not relying on Moodle's lazy
+// plugin-loading timing — same lesson as the $DB-scope bug: this runs
+// before $OUTPUT->header() would otherwise trigger it.
+require_once($CFG->dirroot . '/local/erasight/lib.php');
+
+$landingcourses = [];
+$rawcourses = core_course_category::top()->get_courses(['recursive' => true, 'limit' => 6]);
+foreach ($rawcourses as $rawcourse) {
+    if (!$rawcourse->visible) {
+        continue;
+    }
+    $landingcourses[] = (object) [
+        'id' => $rawcourse->id,
+        'fullname' => format_string($rawcourse->fullname),
+        'courseimage' => local_erasight_get_course_image($rawcourse->id, $OUTPUT),
+        'detailurl' => (new moodle_url('/local/erasight/course.php', ['id' => $rawcourse->id]))->out(false),
+        'price' => local_erasight_get_course_price($rawcourse->id),
+    ];
+}
+
+// Testimonials and the team-pricing pitch have no Moodle-native backing
+// data (no reviews/testimonials subsystem exists) — static content, same
+// honesty as this theme's other "no native field for this" callouts
+// elsewhere. Kept in PHP rather than a theme setting for this first pass;
+// worth promoting to an editable setting later if it needs to change often.
+$testimonials = [
+    (object) [
+        'quote' => 'The Kubernetes course paid for itself in the first week — I finally understood why our pods kept restarting instead of just guessing.',
+        'name' => 'Rina Kaur', 'role' => 'Backend Engineer', 'initials' => 'RK',
+    ],
+    (object) [
+        'quote' => "Client Communication Skills gave me an actual script for the 'we're behind schedule' conversation I'd been dreading. Used it the next day.",
+        'name' => 'Jamal Osei', 'role' => 'Product Manager', 'initials' => 'JM',
+    ],
+    (object) [
+        'quote' => 'Genuinely the first design-systems course that talks about governance instead of just color tokens. Shared it with my whole team.',
+        'name' => 'Elena Vasquez', 'role' => 'Senior Designer', 'initials' => 'EV',
+    ],
+];
+
+// No "contact sales" flow exists yet (out of scope for this pass) — the
+// team-pricing CTA points at a real mailto using the site's own configured
+// support contact when set, falling back to the catalog page rather than a
+// dead href="#" when it isn't.
+$teamsctaurl = !empty($CFG->supportemail)
+    ? 'mailto:' . $CFG->supportemail
+    : (new moodle_url('/local/erasight/catalog.php'))->out(false);
+
+$landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
+    'courses' => $landingcourses,
+    'populartitle' => get_string('landing_popular', 'theme_erasight'),
+    'viewalllabel' => get_string('landing_viewall', 'theme_erasight'),
+    'viewallurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+    'feedbacktitle' => get_string('landing_feedback', 'theme_erasight'),
+    'testimonials' => $testimonials,
+    'teamstitle' => get_string('landing_teams_title', 'theme_erasight'),
+    'teamsbody' => get_string('landing_teams_body', 'theme_erasight'),
+    'teamscta' => get_string('landing_teams_cta', 'theme_erasight'),
+    'teamsctaurl' => $teamsctaurl,
+]);
 // --- Erasight addition ends here ---
 
 $templatecontext = [
@@ -149,6 +212,7 @@ $templatecontext = [
     'headercontent' => $headercontent,
     'addblockbutton' => $addblockbutton,
     'herohtml' => $herohtml,
+    'landinghtml' => $landinghtml,
 ];
 
 echo $OUTPUT->render_from_template('theme_erasight/frontpage', $templatecontext);

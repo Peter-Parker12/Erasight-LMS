@@ -2,12 +2,14 @@
     @template theme_erasight/frontpage
 
     A near-copy of theme_boost/drawers.mustache (fetched and read in full
-    from MOODLE_405_STABLE before writing this), used only by
-    theme_erasight/layout/frontpage.php for the site front page. The only
-    difference from the original is the "herohtml" line inserted just
-    before the "output.main_content" region — everything else (drawers,
-    nav, header, footer) is unchanged so the front page keeps normal
-    Moodle chrome around the new hero banner.
+    from MOODLE_405_STABLE before writing this) — everything else (drawers,
+    nav, header, footer) is unchanged so pages using it keep normal Moodle
+    chrome. Shared by three layouts, not frontpage-specific despite the
+    name: layout/frontpage.php ("herohtml" + "landinghtml" — hero banner
+    plus the priced course grid/testimonials/team band), layout/mydashboard.php
+    and layout/mycourses.php (both just "herohtml", populated with the
+    simpler "banner" template instead of "hero" — "landinghtml" stays empty
+    there, which Mustache renders as nothing, not an error).
 
     NOTE: do not quote literal Mustache tags (double/triple braces) in this
     comment block — Mustache comments close on the first "}}" they find, not
@@ -124,6 +126,7 @@
                             </div>
                         {{/overflow}}
                         {{{ herohtml }}}
+                        {{{ landinghtml }}}
                         {{{ output.main_content }}}
                         {{{ output.activity_navigation }}}
                         {{{ output.course_content_footer }}}

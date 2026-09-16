@@ -72,6 +72,48 @@ php admin/cli/cfg.php --name=enablewebservices --set=1
 php admin/cli/cfg.php --name=webserviceprotocols --set=rest,mcp
 echo "Web services + REST/MCP protocols enabled."
 
+# Paid-course storefront: enrol_fee (the modern paid-enrolment method) and
+# paygw_paypal (the only payment gateway bundled in Moodle core — confirmed
+# against payment/gateway/ on MOODLE_405_STABLE) enabled sitewide. Both
+# config names confirmed directly from source, not assumed:
+# enrol_plugins_enabled in lib/enrollib.php (enrol_get_plugins()/
+# enrol_is_enabled()), paygw_plugins_sortorder in
+# lib/classes/plugininfo/paygw.php (enable_plugin()/set_enabled_plugins(),
+# which literally calls set_config('paygw_plugins_sortorder', ...)).
+#
+# Both are READ then APPENDED, never blindly overwritten — Moodle's own
+# installer already enables several enrolment methods by default (manual,
+# self, guest, cohort, ...), and a blind --set would silently disable
+# whichever of those an admin is actually relying on for existing courses.
+#
+# Tradeoff accepted, not hidden: this runs on every `docker compose up`, so
+# if an admin later deliberately disables 'fee' or 'paypal' via the UI (e.g.
+# pausing paid enrolment temporarily), the next redeploy will silently
+# re-enable it — unlike the theme setting below, this isn't guarded to
+# "only set once". Judged lower-risk than the theme case: enabling the
+# plugin sitewide only makes it an available option, it doesn't add a fee
+# instance (a price) to any course by itself — that stays a genuinely
+# separate, per-course manual step either way.
+CURRENT_ENROL=$(php admin/cli/cfg.php --name=enrol_plugins_enabled --no-eol 2>/dev/null || echo "")
+case ",${CURRENT_ENROL}," in
+  *,fee,*) echo "enrol_fee already enabled." ;;
+  *)
+    NEW_ENROL=$([ -z "${CURRENT_ENROL}" ] && echo "fee" || echo "${CURRENT_ENROL},fee")
+    php admin/cli/cfg.php --name=enrol_plugins_enabled --set="${NEW_ENROL}"
+    echo "Added 'fee' to enrol_plugins_enabled (was: ${CURRENT_ENROL:-<empty>})."
+    ;;
+esac
+
+CURRENT_PAYGW=$(php admin/cli/cfg.php --name=paygw_plugins_sortorder --no-eol 2>/dev/null || echo "")
+case ",${CURRENT_PAYGW}," in
+  *,paypal,*) echo "paygw_paypal already enabled." ;;
+  *)
+    NEW_PAYGW=$([ -z "${CURRENT_PAYGW}" ] && echo "paypal" || echo "${CURRENT_PAYGW},paypal")
+    php admin/cli/cfg.php --name=paygw_plugins_sortorder --set="${NEW_PAYGW}"
+    echo "Added 'paypal' to paygw_plugins_sortorder (was: ${CURRENT_PAYGW:-<empty>})."
+    ;;
+esac
+
 # Sets 'erasight' as the starting theme, but ONLY if no theme has ever been
 # explicitly set — covers both a genuinely fresh install AND this deploy's
 # own transition off the old $CFG->theme force in config.php (in that case

@@ -1,0 +1,78 @@
+{{!
+    @template local_erasight/course
+
+    The "Course Details" pre-purchase page. New, plugin-owned markup, not a
+    core override. Deliberately does NOT show ratings, enrolled-count, or a
+    "what you'll learn" bullet list the way the design mockup did — Moodle
+    has no native data for any of those, only real fields are rendered here.
+
+    Example context (json):
+    {
+        "id": 2, "fullname": "Docker & Kubernetes Fundamentals", "category": "Engineering",
+        "summary": "<p>...</p>", "courseimage": "#", "price": {"formatted": "$79.00"},
+        "enrolled": false, "viewurl": "#", "enrolurl": "#", "catalogurl": "#",
+        "instructor": {"fullname": "Duy Le"},
+        "curriculum": [ {"title": "Foundations", "items": [{"name": "Why containers"}]} ],
+        "lessoncount": 4
+    }
+}}
+<div class="erasight-coursedetail">
+    <div class="erasight-cd-hero" style='background-image: linear-gradient(180deg, rgba(36,23,8,.15), rgba(36,23,8,.75)), url("{{{courseimage}}}");'>
+        <div class="erasight-cd-hero-inner">
+            <div class="erasight-cd-crumb"><a href="{{catalogurl}}">{{#str}} catalog, local_erasight {{/str}}</a> / {{category}}</div>
+            {{#category}}<span class="erasight-cd-cat">{{category}}</span>{{/category}}
+            <h1>{{fullname}}</h1>
+            {{#curriculum}}<div class="erasight-cd-stats"><span>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</span></div>{{/curriculum}}
+        </div>
+
+        <div class="erasight-buy-card">
+            <div class="erasight-buy-body">
+                {{#price}}
+                    <div class="erasight-buy-price">{{formatted}}</div>
+                {{/price}}
+                {{^price}}
+                    <div class="erasight-buy-price erasight-buy-price-tbd">{{#str}} pricetbd, local_erasight {{/str}}</div>
+                {{/price}}
+
+                {{#enrolled}}
+                    <a class="erasight-buy-btn" href="{{viewurl}}">{{#str}} gotocourse, local_erasight {{/str}}</a>
+                {{/enrolled}}
+                {{^enrolled}}
+                    <a class="erasight-buy-btn" href="{{enrolurl}}">{{#str}} enrolnow, local_erasight {{/str}}</a>
+                {{/enrolled}}
+                <div class="erasight-buy-secure">{{#str}} securecheckout, local_erasight {{/str}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="erasight-cd-body">
+        <div class="erasight-cd-main">
+            <h3>{{#str}} description, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-summary">{{{summary}}}</div>
+
+            {{#curriculum}}
+            <h3>{{#str}} coursecontent, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-curriculum">
+                {{#curriculum}}
+                <div class="erasight-cd-cusec">
+                    <div class="erasight-cd-cuhead">{{title}}</div>
+                    <div class="erasight-cd-culessons">
+                        {{#items}}<div class="erasight-cd-cuitem">{{name}}</div>{{/items}}
+                    </div>
+                </div>
+                {{/curriculum}}
+            </div>
+            {{/curriculum}}
+        </div>
+
+        {{#instructor}}
+        <div class="erasight-cd-side">
+            <h3>{{#str}} instructor, local_erasight {{/str}}</h3>
+            <div class="erasight-cd-instructor">
+                <div class="erasight-cd-avatar">{{initials}}</div>
+                <div>{{fullname}}</div>
+            </div>
+        </div>
+        {{/instructor}}
+    </div>
+</div>

@@ -22,3 +22,10 @@ $string['colorscheme'] = 'Color scheme';
 $string['colorscheme_desc'] = 'Applies site-wide — Home, Dashboard, My courses, and Site administration all follow it, not just student-facing pages.';
 $string['colorscheme_light'] = 'Light';
 $string['colorscheme_dark'] = 'Dark';
+
+$string['landing_popular'] = 'Popular courses';
+$string['landing_viewall'] = 'View all courses';
+$string['landing_feedback'] = 'Student feedback';
+$string['landing_teams_title'] = 'Bring Erasight to your whole team';
+$string['landing_teams_body'] = 'One invoice, centralized billing, and a manager dashboard showing exactly who\'s finished what — without chasing screenshots of certificates.';
+$string['landing_teams_cta'] = 'Get team pricing';

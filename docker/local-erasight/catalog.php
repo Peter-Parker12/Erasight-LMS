@@ -18,6 +18,12 @@
 // course_summary_exporter.php) that's easy to get subtly wrong without a
 // live install to catch a missing-property fatal on.
 require(__DIR__ . '/../../config.php');
+// Explicit, not relying on Moodle's lazy plugin-loading timing: lib.php only
+// gets auto-included as a side effect of navigation-building, which happens
+// during $OUTPUT->header() — but local_erasight_get_course_image() below is
+// called before that. Same lesson as the earlier $DB-scope bug in
+// theme_erasight's layout files: don't assume a function is in scope.
+require_once(__DIR__ . '/lib.php');
 
 require_login();
 
@@ -55,7 +61,7 @@ foreach ($courses as $course) {
         'id' => $course->id,
         'uniqid' => uniqid(),
         'viewurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out(false),
-        'courseimage' => $OUTPUT->get_generated_image_for_id($course->id),
+        'courseimage' => local_erasight_get_course_image($course->id, $OUTPUT),
         'fullname' => format_string($course->fullname),
         'shortname' => format_string($course->shortname),
         'showshortname' => (bool) $CFG->courselistshortnames,

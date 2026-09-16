@@ -78,3 +78,70 @@ function local_erasight_extend_settings_navigation(settings_navigation $settings
         $quicklinks->remove();
     }
 }
+
+// Single source of truth for "what does this course cost" — used by
+// catalog.php, course.php, and theme_erasight's front-page course grid.
+// Deliberately lives here rather than in theme_erasight/lib.php: a theme's
+// lib.php functions are only reliably loaded when that theme is the active
+// one, and the site's active theme is now admin-switchable (see the
+// theme_erasight color-scheme/theme-selector work) — a local plugin's
+// lib.php has no such dependency, it's loaded regardless of theme choice.
+//
+// Returns null (not a fatal error) when the course has no enrol_fee
+// instance yet, which is expected while courses are being rolled over to
+// paid enrolment one at a time. enrol_get_instances() and
+// \core_payment\helper::get_cost_as_string() both verified against real
+// source (lib/enrollib.php, payment/classes/helper.php) on MOODLE_405_STABLE
+// before use here.
+// Real uploaded "Course image" (Site administration -> course settings ->
+// Course image) if one exists, falling back to Moodle's own generated
+// pattern placeholder otherwise — exactly the "configure it in the LMS, or
+// get a placeholder to replace later" the user asked for, with no new
+// upload path needed since Moodle already has one.
+//
+// Deliberately does NOT use \core_course\external\course_summary_exporter::
+// get_course_image() (a cache-backed static method whose population
+// mechanism wasn't verified) — builds the URL directly from the real
+// stored_file via get_area_files() + moodle_url::make_pluginfile_url(),
+// both stable, well-documented APIs, matching catalog.php's own established
+// preference for plain verified APIs over the exporter classes.
+function local_erasight_get_course_image($courseid, $renderer) {
+    global $CFG;
+    if (!empty($CFG->courseoverviewfileslimit)) {
+        $fs = get_file_storage();
+        $context = context_course::instance($courseid);
+        $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', false, 'filename', false);
+        foreach ($files as $file) {
+            if ($file->is_directory()) {
+                continue;
+            }
+            return moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            )->out();
+        }
+    }
+    return $renderer->get_generated_image_for_id($courseid);
+}
+
+function local_erasight_get_course_price($courseid) {
+    $instances = enrol_get_instances($courseid, true);
+    foreach ($instances as $instance) {
+        if ($instance->enrol !== 'fee') {
+            continue;
+        }
+        if ((float) $instance->cost <= 0 || empty($instance->currency)) {
+            continue;
+        }
+        return (object) [
+            'cost' => (float) $instance->cost,
+            'currency' => $instance->currency,
+            'formatted' => \core_payment\helper::get_cost_as_string((float) $instance->cost, $instance->currency),
+        ];
+    }
+    return null;
+}

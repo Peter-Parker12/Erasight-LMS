@@ -27,3 +27,14 @@ $string['quicklink_manageenrols'] = 'Manage enrolment plugins';
 $string['quicklink_manageenrols_desc'] = 'Turn enrolment methods on or off site-wide.';
 $string['quicklink_siteadmin'] = 'Full Site administration';
 $string['quicklink_siteadmin_desc'] = 'Search or browse every setting — this page is a shortcut layer, not a replacement.';
+
+$string['coursedetails'] = 'Course details';
+$string['lessons'] = 'lessons';
+$string['sectionname'] = 'Section {$a}';
+$string['pricetbd'] = 'Price coming soon';
+$string['gotocourse'] = 'Go to course';
+$string['enrolnow'] = 'Enrol now';
+$string['securecheckout'] = 'Secure checkout via PayPal';
+$string['description'] = 'Description';
+$string['coursecontent'] = 'Course content';
+$string['instructor'] = 'Instructor';

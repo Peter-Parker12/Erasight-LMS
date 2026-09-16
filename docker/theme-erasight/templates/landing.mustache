@@ -1,0 +1,67 @@
+{{!
+    @template theme_erasight/landing
+
+    The priced course grid + testimonials + team-pricing band inserted below
+    the hero on the front page (see layout/frontpage.php, templates/frontpage.mustache).
+    New, theme-owned markup — not a core override, and deliberately its own
+    small card markup here rather than reusing core_course/coursecard.mustache,
+    since that shared template also renders on the dashboard/catalog where a
+    price shouldn't appear for an already-enrolled student.
+
+    Example context (json):
+    {
+        "courses": [ {"id": 2, "fullname": "Docker Fundamentals", "courseimage": "#", "detailurl": "#", "price": {"formatted": "$79.00"}} ],
+        "populartitle": "Popular courses", "viewalllabel": "View all courses", "viewallurl": "#",
+        "feedbacktitle": "Student feedback",
+        "testimonials": [ {"quote": "...", "name": "Rina Kaur", "role": "Backend Engineer", "initials": "RK"} ],
+        "teamstitle": "Bring Erasight to your whole team", "teamsbody": "...", "teamscta": "Get team pricing"
+    }
+}}
+<div class="erasight-landing">
+    {{#courses}}
+    <div class="erasight-landing-section">
+        <div class="erasight-landing-head">
+            <h3>{{populartitle}}</h3>
+            <a href="{{viewallurl}}">{{viewalllabel}}</a>
+        </div>
+        <div class="erasight-landing-grid">
+            {{#courses}}
+            <a class="erasight-landing-card" href="{{detailurl}}">
+                <div class="erasight-landing-thumb" style='background-image: url("{{{courseimage}}}");'></div>
+                <div class="erasight-landing-cardbody">
+                    <h4>{{fullname}}</h4>
+                    {{#price}}<div class="erasight-landing-price">{{formatted}}</div>{{/price}}
+                </div>
+            </a>
+            {{/courses}}
+        </div>
+    </div>
+    {{/courses}}
+
+    {{#testimonials}}
+    <div class="erasight-landing-section erasight-landing-section-alt">
+        <div class="erasight-landing-head"><h3>{{feedbacktitle}}</h3></div>
+        <div class="erasight-testimonial-grid">
+            {{#testimonials}}
+            <div class="erasight-tcard">
+                <blockquote>&ldquo;{{quote}}&rdquo;</blockquote>
+                <div class="erasight-tcard-who">
+                    <div class="erasight-tcard-avatar">{{initials}}</div>
+                    <div><strong>{{name}}</strong><span>{{role}}</span></div>
+                </div>
+            </div>
+            {{/testimonials}}
+        </div>
+    </div>
+    {{/testimonials}}
+
+    <div class="erasight-landing-section">
+        <div class="erasight-teams-band">
+            <div>
+                <h3>{{teamstitle}}</h3>
+                <p>{{teamsbody}}</p>
+                <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{teamsctaurl}}">{{teamscta}}</a>
+            </div>
+        </div>
+    </div>
+</div>

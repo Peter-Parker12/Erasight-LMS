@@ -32,3 +32,19 @@ function theme_erasight_get_extra_scss($theme) {
     $scss .= file_get_contents($CFG->dirroot . '/theme/erasight/scss/post.scss');
     return $scss;
 }
+
+// The legacy plugin callback Moodle's before_standard_head_html_generation
+// hook bridges for backward compatibility (confirmed via
+// lib/classes/hook/output/before_standard_head_html_generation.php on
+// MOODLE_405_STABLE: #[replaces_callbacks('before_standard_html_head')],
+// discovered via get_plugins_with_function() and called with zero
+// arguments, its return value appended into every page's <head>,
+// regardless of layout). This is the real, correct place for the Google
+// Fonts <link> that used to be an SCSS @import — see the long comment in
+// scss/post.scss for why that broke this theme's entire custom CSS in
+// production.
+function theme_erasight_before_standard_html_head() {
+    return '<link rel="preconnect" href="https://fonts.googleapis.com">'
+        . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+        . '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">';
+}

@@ -1,7 +1,19 @@
-// Loaded AFTER Bootstrap compiles (theme_boost_get_extra_scss). This is a
-// real Docker deployment serving real browsers, not the sandboxed artifact
-// preview — an external @import for Google Fonts works normally here.
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+// Google Fonts are loaded via a real <link> tag in <head>
+// (theme_erasight_before_standard_html_head() in lib.php), not an SCSS
+// @import — confirmed live that Moodle's bundled scssphp compiler does NOT
+// treat `@import url("https://...")` as a plain CSS passthrough the way
+// dart-sass/modern Sass does; it tries to resolve it as a local partial
+// file, fails with "file not found for @import", and — since that failure
+// happens inside the try/catch in theme_config::get_css_content_from_scss()
+// — Moodle silently discards this entire extra-SCSS block and falls back
+// to serving Boost's own CSS with none of this theme's customisation at
+// all. This exact bug shipped live and took an extended debugging session
+// (isolating theme_config::load('erasight')->get_css_content() directly,
+// with Moodle's own debug level raised, to see the swallowed exception) to
+// actually surface, since production mode never shows it. Do not reintroduce
+// a remote-URL @import anywhere in this SCSS pipeline (pre.scss or
+// post.scss) without testing the real compiled output on a live deploy —
+// dart-sass compiling it locally is not sufficient proof it will work here.
 
 // $erasight-dark is set by lib.php's theme_erasight_get_extra_scss(),
 // reading the theme_erasight/colorscheme admin setting (settings.php),

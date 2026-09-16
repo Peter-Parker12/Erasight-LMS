@@ -49,10 +49,19 @@ function xmldb_local_erasight_upgrade($oldversion) {
             $field = \core_customfield\field_controller::create(0, (object) [
                 'categoryid' => $category->get('id'),
                 'type' => 'textarea',
+            ], $category);
+            // save_field_configuration() takes the field controller plus a
+            // separate $formdata object (verified against
+            // customfield/classes/api.php — it copies each recognised
+            // property from $formdata onto the field via set() before
+            // saving); passing only the field controller itself, as an
+            // earlier version of this file did, is one argument short and
+            // fatals with ArgumentCountError.
+            \core_customfield\api::save_field_configuration($field, (object) [
                 'shortname' => $shortname,
                 'name' => $name,
-            ], $category);
-            \core_customfield\api::save_field_configuration($field);
+                'configdata' => [],
+            ]);
         }
 
         upgrade_plugin_savepoint(true, 2026091700, 'local', 'erasight');

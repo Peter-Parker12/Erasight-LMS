@@ -33,18 +33,11 @@ function theme_erasight_get_extra_scss($theme) {
     return $scss;
 }
 
-// The legacy plugin callback Moodle's before_standard_head_html_generation
-// hook bridges for backward compatibility (confirmed via
-// lib/classes/hook/output/before_standard_head_html_generation.php on
-// MOODLE_405_STABLE: #[replaces_callbacks('before_standard_html_head')],
-// discovered via get_plugins_with_function() and called with zero
-// arguments, its return value appended into every page's <head>,
-// regardless of layout). This is the real, correct place for the Google
-// Fonts <link> that used to be an SCSS @import — see the long comment in
-// scss/post.scss for why that broke this theme's entire custom CSS in
-// production.
-function theme_erasight_before_standard_html_head() {
-    return '<link rel="preconnect" href="https://fonts.googleapis.com">'
-        . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-        . '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">';
-}
+// The Google Fonts <link> tags (needed sitewide, not just the 3 forked
+// layouts, since this replaces a broken SCSS @import — see the long
+// comment in scss/post.scss) are registered as a proper Moodle 4.4+ hook
+// listener in classes/hook_callbacks.php + db/hooks.php, not as a
+// theme_erasight_before_standard_html_head() function here — that legacy
+// callback style still works (Moodle bridges it automatically) but logs a
+// deprecation notice once debug is turned up, and there is no reason to
+// use the deprecated form for new code.

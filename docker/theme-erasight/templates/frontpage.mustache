@@ -11,10 +11,12 @@
     simpler "banner" template instead of "hero" — "landinghtml" stays empty
     there, which Mustache renders as nothing, not an error).
 
-    NOTE: do not quote literal Mustache tags (double/triple braces) in this
-    comment block — Mustache comments close on the first "}}" they find, not
-    a matched/nested one, so any tag-like text here will truncate the
-    comment early and leak the remainder as literal page output.
+    NOTE: never write two closing-brace characters next to each other
+    anywhere in this comment block, quoted or not — a Mustache comment
+    ends at the first such occurrence it scans past, not a matched or
+    nested one, so any brace-adjacent text here truncates the comment
+    early and leaks the remainder as literal page output. (This note
+    itself was rewritten once already after violating this rule.)
 }}
 {{> theme_boost/head }}
 

@@ -8,14 +8,19 @@
     since that shared template also renders on the dashboard/catalog where a
     price shouldn't appear for an already-enrolled student.
 
-    Example context (json):
-    {
-        "courses": [ {"id": 2, "fullname": "Docker Fundamentals", "courseimage": "#", "detailurl": "#", "price": {"formatted": "$79.00"}} ],
-        "populartitle": "Popular courses", "viewalllabel": "View all courses", "viewallurl": "#",
-        "feedbacktitle": "Student feedback",
-        "testimonials": [ {"quote": "...", "name": "Rina Kaur", "role": "Backend Engineer", "initials": "RK"} ],
-        "teamstitle": "Bring Erasight to your whole team", "teamsbody": "...", "teamscta": "Get team pricing"
-    }
+    Context: courses (array of id/fullname/courseimage/detailurl/price,
+    where price is itself an object with a "formatted" string, or absent),
+    populartitle/viewalllabel/viewallurl, feedbacktitle, testimonials (array
+    of quote/name/role/initials), teamstitle/teamsbody/teamscta/teamsctaurl.
+
+    NOTE: deliberately described in prose above, not as a literal JSON
+    example — a nested JSON object here previously produced two adjacent
+    closing-brace characters, which closed this Mustache comment early
+    (it ends at the first such occurrence it scans past, not a matched
+    one) and leaked the rest of this comment plus broke the template's
+    own section boundaries into the live page. Never write two
+    closing-brace characters next to each other anywhere in this
+    comment block, quoted or not.
 }}
 <div class="erasight-landing">
     {{#courses}}

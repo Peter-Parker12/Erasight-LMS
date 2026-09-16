@@ -4,14 +4,21 @@
 
     Keeps the same data-region/data-course-id/id attributes the JS in
     blocks/myoverview/amd relies on, and keeps the same four override slots
-    the base template defines ({{$coursename}}, {{$coursecategory}},
-    {{$progress}}, {{$menu}}) in the same names so
-    block_myoverview/view-cards.mustache's own overrides of those slots
-    keep landing correctly — only the surrounding markup moved.
+    the base template defines (coursename, coursecategory, progress, menu)
+    in the same names so block_myoverview/view-cards.mustache's own
+    overrides of those slots keep landing correctly — only the
+    surrounding markup moved.
 
     Note: Moodle has no native rating/enrolled-count/duration data for a
     course, so this card doesn't invent any — those were mockup flourishes,
     not real Moodle fields.
+
+    NOTE: never write two closing-brace characters next to each other in
+    this comment block (including inside a slot/tag name mention like
+    coursename above) — a Mustache comment ends at the first such
+    occurrence it scans past, not a matched one, and this exact mistake
+    here previously broke this override on every page that renders a
+    course card (dashboard, My courses, catalog).
 }}
 <div class="card course-card erasight-course-card mx-1" role="listitem"
     data-region="course-content"

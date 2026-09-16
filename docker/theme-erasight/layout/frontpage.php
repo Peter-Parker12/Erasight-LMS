@@ -179,10 +179,19 @@ $teamsctaurl = !empty($CFG->supportemail)
 
 $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
     'courses' => $landingcourses,
+    // Separate boolean guards, not a reuse of the arrays themselves as
+    // pseudo-booleans — in Mustache, {{#array}}...{{/array}} repeats its
+    // block once PER ELEMENT, it is not an "if non-empty" check. Wrapping
+    // a whole section (including its own heading) in {{#testimonials}}
+    // when there are 3 testimonials rendered that whole section 3 times
+    // on the live site; only the courses section looked fine, coincidentally,
+    // because there was exactly 1 course to iterate.
+    'hascourses' => !empty($landingcourses),
     'populartitle' => get_string('landing_popular', 'theme_erasight'),
     'viewalllabel' => get_string('landing_viewall', 'theme_erasight'),
     'viewallurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
     'feedbacktitle' => get_string('landing_feedback', 'theme_erasight'),
+    'hastestimonials' => !empty($testimonials),
     'testimonials' => $testimonials,
     'teamstitle' => get_string('landing_teams_title', 'theme_erasight'),
     'teamsbody' => get_string('landing_teams_body', 'theme_erasight'),

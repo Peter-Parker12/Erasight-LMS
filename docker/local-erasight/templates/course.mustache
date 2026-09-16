@@ -11,19 +11,29 @@
     Context: id/fullname/category/summary/courseimage, price (object with
     a formatted string, or absent), enrolled (bool), viewurl/enrolurl/
     catalogurl, instructor (fullname/initials, or absent), curriculum
-    (array of title/items, each item a name) plus lessoncount, isnew
-    (bool, from course creation date), hascertificate (bool, only true
-    when the course contains a real certificate activity), accesstext
-    (a real access-duration string, or absent when there's no price yet),
-    and three optional admin-authored HTML blocks — learncontent,
-    requirementscontent, faqcontent — sourced from real course custom
-    fields (see local_erasight_get_course_customfields() in lib.php),
-    each section omitted entirely when its field is left blank.
+    (array of title/items, each item a name) plus a separate hascurriculum
+    boolean and lessoncount, isnew (bool, from course creation date),
+    hascertificate (bool, only true when the course contains a real
+    certificate activity), accesstext (a real access-duration string, or
+    absent when there's no price yet), and three optional admin-authored
+    HTML blocks — learncontent, requirementscontent, faqcontent — sourced
+    from real course custom fields (see
+    local_erasight_get_course_customfields() in lib.php), each section
+    omitted entirely when its field is left blank.
 
     NOTE: never write two closing-brace characters next to each other
     anywhere in this comment block — a Mustache comment ends at the first
     such occurrence it scans past, not a matched one, which is why this
     comment is prose rather than a literal JSON/tag example.
+
+    NOTE: hascurriculum exists as a separate key from curriculum on
+    purpose — a curriculum section tag repeats its block once PER SECTION,
+    it is not an "if non-empty" guard. Using curriculum itself to wrap the
+    "Course content" heading meant any course with more than one section
+    duplicated that heading and the lesson-count stat once per section
+    (the exact bug that also hit landing.mustache's testimonials section
+    — same fix here: a real boolean for the guard, the array only for
+    the loop).
 }}
 <div class="erasight-coursedetail">
     <div class="erasight-cd-hero" style='background-image: linear-gradient(180deg, rgba(36,23,8,.15), rgba(36,23,8,.75)), url("{{{courseimage}}}");'>
@@ -32,7 +42,7 @@
             {{#category}}<span class="erasight-cd-cat">{{category}}</span>{{/category}}
             {{#isnew}}<span class="erasight-cd-badge erasight-cd-badge-new">{{#str}} newbadge, local_erasight {{/str}}</span>{{/isnew}}
             <h1>{{fullname}}</h1>
-            {{#curriculum}}<div class="erasight-cd-stats"><span>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</span></div>{{/curriculum}}
+            {{#hascurriculum}}<div class="erasight-cd-stats"><span>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</span></div>{{/hascurriculum}}
         </div>
 
         <div class="erasight-buy-card">
@@ -53,7 +63,7 @@
                 <div class="erasight-buy-secure">{{#str}} securecheckout, local_erasight {{/str}}</div>
 
                 <ul class="erasight-buy-includes">
-                    {{#curriculum}}<li>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</li>{{/curriculum}}
+                    {{#hascurriculum}}<li>{{lessoncount}} {{#str}} lessons, local_erasight {{/str}}</li>{{/hascurriculum}}
                     {{#accesstext}}<li>{{accesstext}}</li>{{/accesstext}}
                     {{#hascertificate}}<li>{{#str}} certificateofcompletion, local_erasight {{/str}}</li>{{/hascertificate}}
                 </ul>
@@ -66,7 +76,7 @@
             <h3>{{#str}} description, local_erasight {{/str}}</h3>
             <div class="erasight-cd-summary">{{{summary}}}</div>
 
-            {{#curriculum}}
+            {{#hascurriculum}}
             <h3>{{#str}} coursecontent, local_erasight {{/str}}</h3>
             <div class="erasight-cd-curriculum">
                 {{#curriculum}}
@@ -78,7 +88,7 @@
                 </div>
                 {{/curriculum}}
             </div>
-            {{/curriculum}}
+            {{/hascurriculum}}
 
             {{#learncontent}}
             <h3>{{#str}} whatyoulllearn, local_erasight {{/str}}</h3>

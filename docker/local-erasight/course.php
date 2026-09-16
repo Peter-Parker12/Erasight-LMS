@@ -129,6 +129,12 @@ echo $OUTPUT->render_from_template('local_erasight/course', [
     'catalogurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
     'instructor' => $instructor,
     'curriculum' => $curriculum,
+    // Separate boolean, not a reuse of the curriculum array itself as a
+    // guard — see the same fix/explanation in theme_erasight/landing.mustache
+    // (hascourses/hastestimonials): {{#curriculum}} repeats its block once
+    // per section, so any course with more than one curriculum section was
+    // duplicating the "Course content" heading and the lesson-count stat.
+    'hascurriculum' => !empty($curriculum),
     'lessoncount' => array_sum(array_map(fn($s) => count($s->items), $curriculum)),
     'isnew' => $isnew,
     'hascertificate' => $hascertificate,

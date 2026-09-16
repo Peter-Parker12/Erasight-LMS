@@ -9,9 +9,19 @@
     price shouldn't appear for an already-enrolled student.
 
     Context: courses (array of id/fullname/courseimage/detailurl/price,
-    where price is itself an object with a "formatted" string, or absent),
-    populartitle/viewalllabel/viewallurl, feedbacktitle, testimonials (array
-    of quote/name/role/initials), teamstitle/teamsbody/teamscta/teamsctaurl.
+    where price is itself an object with a "formatted" string, or absent)
+    plus a separate hascourses boolean, populartitle/viewalllabel/viewallurl,
+    feedbacktitle, testimonials (array of quote/name/role/initials) plus a
+    separate hastestimonials boolean, teamstitle/teamsbody/teamscta/teamsctaurl.
+
+    The hascourses/hastestimonials booleans exist because Mustache sections
+    have only one behavior for an array: repeat the block once per element.
+    Wrapping a whole section (heading included) directly in a courses or
+    testimonials section tag is not an "if non-empty" guard — with 3
+    testimonials it rendered that entire section, heading and all, 3 times
+    on the live site. Only the courses section looked fine, coincidentally,
+    because there was exactly 1 course to iterate. The outer guard and the
+    inner loop must use different keys, never the same tag twice.
 
     NOTE: deliberately described in prose above, not as a literal JSON
     example — a nested JSON object here previously produced two adjacent
@@ -23,7 +33,7 @@
     comment block, quoted or not.
 }}
 <div class="erasight-landing">
-    {{#courses}}
+    {{#hascourses}}
     <div class="erasight-landing-section">
         <div class="erasight-landing-head">
             <h3>{{populartitle}}</h3>
@@ -41,9 +51,9 @@
             {{/courses}}
         </div>
     </div>
-    {{/courses}}
+    {{/hascourses}}
 
-    {{#testimonials}}
+    {{#hastestimonials}}
     <div class="erasight-landing-section erasight-landing-section-alt">
         <div class="erasight-landing-head"><h3>{{feedbacktitle}}</h3></div>
         <div class="erasight-testimonial-grid">
@@ -58,7 +68,7 @@
             {{/testimonials}}
         </div>
     </div>
-    {{/testimonials}}
+    {{/hastestimonials}}
 
     <div class="erasight-landing-section">
         <div class="erasight-teams-band">

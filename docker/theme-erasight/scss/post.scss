@@ -406,7 +406,10 @@ body.pagelayout-course {
 
 .erasight-hero-tagline {
   font-size: 1.05rem;
-  opacity: .85;
+  // Raised from opacity .85 — this sits directly on the hero's blue-to-
+  // umber gradient, where reduced-opacity white was noticeably harder to
+  // read on the lighter (blue) half than the darker half.
+  opacity: .95;
   margin-bottom: 1.75rem;
 }
 
@@ -467,7 +470,7 @@ body.pagelayout-course {
   font-size: .72rem;
   text-transform: uppercase;
   letter-spacing: .05em;
-  opacity: .75;
+  opacity: .88;
 }
 
 // Phase 10 — priced course grid, testimonials, and team-pricing band on the
@@ -582,7 +585,7 @@ body.pagelayout-course {
 
 .erasight-tcard-who span {
   display: block;
-  opacity: .65;
+  opacity: .8;
 }
 
 .erasight-tcard-avatar {
@@ -616,7 +619,7 @@ body.pagelayout-course {
 
 .erasight-teams-band p {
   font-size: .87rem;
-  opacity: .8;
+  opacity: .92;
   max-width: 48ch;
   margin-bottom: 1.1rem;
 }

@@ -25,8 +25,13 @@ require(__DIR__ . '/../../config.php');
 // theme_erasight's layout files: don't assume a function is in scope.
 require_once(__DIR__ . '/lib.php');
 
-require_login();
-
+// Deliberately public — no require_login(). A storefront-style catalog
+// (browse freely, authenticate only to enrol/buy) needs to be visible to
+// anonymous visitors, same reasoning as course.php. Everything below
+// already handles an anonymous $USER correctly: is_enrolled() and
+// has_capability() both work fine for id=0 (the guest-state default Moodle
+// sets up regardless of login), and hidden courses stay hidden from
+// anonymous visitors via the same has_capability() check as before.
 $PAGE->set_url(new moodle_url('/local/erasight/catalog.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('course');

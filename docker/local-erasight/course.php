@@ -16,8 +16,17 @@ require(__DIR__ . '/../../config.php');
 // same note in catalog.php.
 require_once(__DIR__ . '/lib.php');
 
-require_login();
-
+// Deliberately public — no require_login(). This is the pre-purchase
+// preview page; a storefront needs anonymous visitors to be able to see
+// it before deciding to log in and enrol. The hidden-course check right
+// below still applies to anonymous visitors exactly as it does to logged-
+// in ones (has_capability() resolves correctly against the guest-state
+// $USER Moodle always sets up, id=0, regardless of login), and the
+// curriculum listing further down still only shows what get_fast_modinfo()
+// marks uservisible for the current (possibly anonymous) user — so a
+// course without guest access enabled may show a sparser curriculum to an
+// anonymous visitor than to an enrolled student, which is Moodle's own
+// normal permission model working as intended, not a gap introduced here.
 $id = required_param('id', PARAM_INT);
 $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 $coursecontext = context_course::instance($course->id);

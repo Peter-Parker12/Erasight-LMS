@@ -11,9 +11,12 @@
     simpler "banner" template instead of "hero" — "landinghtml" stays empty
     there, which Mustache renders as nothing, not an error).
 
-    hidenavbar (bool, optional) suppresses the persistent top site nav bar
-    entirely — only layout/frontpage.php sets this, so mydashboard.php and
-    mycourses.php keep normal navigation for logged-in users.
+    hidenavbar (bool, optional) suppresses BOTH the persistent top site nav
+    bar AND output.full_header (Moodle's own page-heading bar, which
+    otherwise showed a redundant, low-contrast "sitename" heading above
+    this theme's own hero) — only layout/frontpage.php sets this, so
+    mydashboard.php and mycourses.php keep normal chrome for logged-in
+    users navigating the rest of the site.
 
     NOTE: never write two closing-brace characters next to each other
     anywhere in this comment block, quoted or not — a Mustache comment
@@ -102,7 +105,7 @@
                     </div>
                 {{/hasblocks}}
             </div>
-            {{{ output.full_header }}}
+            {{^hidenavbar}}{{{ output.full_header }}}{{/hidenavbar}}
             {{#secondarymoremenu}}
                 <div class="secondary-navigation d-print-none">
                     {{> core/moremenu}}

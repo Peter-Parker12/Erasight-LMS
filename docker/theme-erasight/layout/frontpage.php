@@ -122,6 +122,10 @@ $herostats = [
 
 $herohtml = $OUTPUT->render_from_template('theme_erasight/hero', [
     'sitename' => format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]),
+    'eyebrow' => get_string('hero_eyebrow', 'theme_erasight'),
+    'headlinepre' => get_string('hero_headline_pre', 'theme_erasight'),
+    'headlineemphasis' => get_string('hero_headline_emphasis', 'theme_erasight'),
+    'headlinepost' => get_string('hero_headline_post', 'theme_erasight'),
     'tagline' => get_string('hero_tagline', 'theme_erasight'),
     'cta' => $herocta,
     'stats' => $herostats,
@@ -200,7 +204,56 @@ $teamsctaurl = !empty($CFG->supportemail)
     ? 'mailto:' . $CFG->supportemail
     : (new moodle_url('/local/erasight/catalog.php'))->out(false);
 
+// Value props, audience copy, and scenario cards below all have no
+// Moodle-native backing data — same treatment as $testimonials above:
+// static, Erasight-specific copy, not derived from real usage data, and
+// deliberately not framed as real client case studies (no invented
+// company names in the scenario cards).
+$valueprops = [
+    (object) [
+        'title' => get_string('valueprop1_title', 'theme_erasight'),
+        'body' => get_string('valueprop1_body', 'theme_erasight'),
+    ],
+    (object) [
+        'title' => get_string('valueprop2_title', 'theme_erasight'),
+        'body' => get_string('valueprop2_body', 'theme_erasight'),
+    ],
+    (object) [
+        'title' => get_string('valueprop3_title', 'theme_erasight'),
+        'body' => get_string('valueprop3_body', 'theme_erasight'),
+    ],
+];
+
+$scenarios = [
+    (object) [
+        'problem' => get_string('scenario1_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario1_outcome', 'theme_erasight'),
+    ],
+    (object) [
+        'problem' => get_string('scenario2_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario2_outcome', 'theme_erasight'),
+    ],
+    (object) [
+        'problem' => get_string('scenario3_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario3_outcome', 'theme_erasight'),
+    ],
+];
+
 $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
+    'valueprops' => $valueprops,
+    'hasvalueprops' => !empty($valueprops),
+    'audienceindividualstitle' => get_string('audience_individuals_title', 'theme_erasight'),
+    'audienceindividualsbody' => get_string('audience_individuals_body', 'theme_erasight'),
+    'audienceteamstitle' => get_string('audience_teams_title', 'theme_erasight'),
+    'audienceteamsbody' => get_string('audience_teams_body', 'theme_erasight'),
+    'scenariostitle' => get_string('scenarios_title', 'theme_erasight'),
+    'scenarios' => $scenarios,
+    'hasscenarios' => !empty($scenarios),
+    'closingctatitle' => get_string('closingcta_title', 'theme_erasight'),
+    'closingctaprimarylabel' => get_string('closingcta_primary', 'theme_erasight'),
+    'closingctaprimaryurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+    'closingctasecondarylabel' => get_string('closingcta_secondary', 'theme_erasight'),
+    'closingctasecondaryurl' => $teamsctaurl,
     'courses' => $landingcourses,
     // Separate boolean guards, not a reuse of the arrays themselves as
     // pseudo-booleans — in Mustache, {{#array}}...{{/array}} repeats its

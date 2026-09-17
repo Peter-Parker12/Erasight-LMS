@@ -3,23 +3,27 @@
 
     The front-page hero banner. New, plugin/theme-owned markup — not a core
     override, so there was nothing to verify markup against; only the data
-    (sitename, cta urls, stats) needed real Moodle APIs, all built in
-    layout/frontpage.php.
+    (sitename, headline pieces, cta urls, stats) needed real Moodle APIs,
+    all built in layout/frontpage.php.
 
-    Example context (json):
-    {
-        "sitename": "Erasight LMS",
-        "tagline": "Internal training, built for how the team actually learns.",
-        "cta": {
-            "primaryurl": "#", "primarylabel": "Browse courses",
-            "secondaryurl": "#", "secondarylabel": "Log in"
-        },
-        "stats": [ {"value": 48, "label": "Courses"} ]
-    }
+    Context: sitename (real, format_string()'d), eyebrow (a small label
+    above the headline — currently the same sitename string, de-emphasized),
+    headlinepre/headlineemphasis/headlinepost (three pieces of one
+    headline sentence, split so the middle piece can be styled distinctly),
+    tagline, cta (an object with primaryurl/primarylabel/secondaryurl/
+    secondarylabel), and stats (an array of value/label — real course and
+    teammate counts, not fabricated).
+
+    NOTE: never write two closing-brace characters next to each other
+    anywhere in this comment block — a Mustache comment ends at the first
+    such occurrence it scans past, not a matched one, which is why this
+    comment is prose rather than a literal JSON/tag example (this exact
+    mistake already broke two other templates in this theme once).
 }}
 <div class="erasight-hero">
     <div class="erasight-hero-inner">
-        <h1 class="erasight-hero-title">{{sitename}}</h1>
+        <div class="erasight-hero-eyebrow">{{eyebrow}}</div>
+        <h1 class="erasight-hero-title">{{headlinepre}}<span class="erasight-emphasis">{{headlineemphasis}}</span>{{headlinepost}}</h1>
         <p class="erasight-hero-tagline">{{tagline}}</p>
         <div class="erasight-hero-cta">
             <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{cta.primaryurl}}">{{cta.primarylabel}}</a>

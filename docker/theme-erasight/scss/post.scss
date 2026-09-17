@@ -393,8 +393,20 @@ body.pagelayout-course {
 
 .erasight-hero-inner {
   max-width: 720px;
-  margin: 0 auto;
-  text-align: center;
+  // Left-aligned, not centered — matches the towardsai.com-style editorial
+  // layout this phase adopted (see README): a left-aligned headline block
+  // rather than a centered marketing-page hero.
+  margin: 0;
+  text-align: left;
+}
+
+.erasight-hero-eyebrow {
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .75;
+  margin-bottom: .9rem;
 }
 
 .erasight-hero-title {
@@ -402,6 +414,15 @@ body.pagelayout-course {
   font-size: clamp(1.9rem, 4vw, 2.75rem);
   font-weight: 800;
   margin-bottom: .75rem;
+}
+
+.erasight-emphasis {
+  // Ember, not sky — the headline sits near the hero gradient's blue end
+  // (radial-gradient origin is top-left, same corner as left-aligned text),
+  // so a warm accent reads with much stronger contrast there than another
+  // blue would. Same accent already used for CTAs/prices elsewhere.
+  font-style: italic;
+  color: var(--erasight-ember);
 }
 
 .erasight-hero-tagline {
@@ -415,7 +436,7 @@ body.pagelayout-course {
 
 .erasight-hero-cta {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: .75rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
@@ -448,16 +469,26 @@ body.pagelayout-course {
   color: #fff;
 }
 
+// A second "secondary" style, for the closing-cta band further down this
+// file — that band sits on the page's normal surface color, not the hero's
+// dark gradient, so the white-on-transparent treatment above would be
+// invisible there.
+.erasight-hero-btn-secondary-alt {
+  background: transparent;
+  border: 1px solid var(--erasight-mist);
+  color: var(--erasight-ink);
+}
+
 .erasight-hero-stats {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 2.5rem;
 }
 
 .erasight-hero-stat {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .erasight-hero-stat-value {
@@ -480,7 +511,9 @@ body.pagelayout-course {
 // show for an already-enrolled student.
 .erasight-landing-section {
   max-width: 1100px;
-  margin: 0 auto 2.5rem;
+  // Raised from 2.5rem — more generous vertical rhythm between sections,
+  // matching the more spacious editorial spacing this phase adopted.
+  margin: 0 auto 4rem;
   padding: 0 .5rem;
 }
 
@@ -591,6 +624,103 @@ body.pagelayout-course {
   font-family: var(--erasight-font-mono);
   font-weight: 700;
   color: var(--erasight-ember);
+}
+
+// Value proposition row (3 columns of new, Erasight-specific copy — see
+// lib/lang and layout/frontpage.php; no fabricated numbers).
+.erasight-valueprops {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.erasight-valueprop h4 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+.erasight-valueprop p {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
+}
+
+// Audience section — a static two-column block (not interactive tabs, to
+// avoid a new AMD JS module for a purely cosmetic switcher).
+.erasight-audience {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.erasight-audience-col {
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  padding: 1.5rem;
+}
+
+.erasight-audience-col h4 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: .5rem;
+}
+
+.erasight-audience-col p {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
+}
+
+// "How teams use Erasight" scenario cards — generic problem/outcome
+// pattern, deliberately not framed as real client case studies.
+.erasight-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.erasight-scenario-card {
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  padding: 1.1rem;
+  background: var(--erasight-surface);
+}
+
+.erasight-scenario-problem {
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--erasight-ember);
+  margin-bottom: .5rem;
+}
+
+.erasight-scenario-outcome {
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+// Closing CTA band — plain page surface, not a gradient, so it reads as a
+// lightweight closer rather than a second hero.
+.erasight-closing-cta {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid var(--erasight-mist);
+}
+
+.erasight-closing-cta h3 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+}
+
+.erasight-closing-cta .erasight-hero-cta {
+  justify-content: center;
+  margin-bottom: 0;
 }
 
 .erasight-testimonial-grid {

@@ -16,14 +16,23 @@
     feedbacktitle, testimonials (array of quote/name/role/initials) plus a
     separate hastestimonials boolean, teamstitle/teamsbody/teamscta/teamsctaurl.
 
-    The hascourses/hastestimonials booleans exist because Mustache sections
-    have only one behavior for an array: repeat the block once per element.
-    Wrapping a whole section (heading included) directly in a courses or
-    testimonials section tag is not an "if non-empty" guard — with 3
-    testimonials it rendered that entire section, heading and all, 3 times
-    on the live site. Only the courses section looked fine, coincidentally,
-    because there was exactly 1 course to iterate. The outer guard and the
-    inner loop must use different keys, never the same tag twice.
+    Also: valueprops (array of title/body) plus a separate hasvalueprops
+    boolean; audienceindividualstitle/audienceindividualsbody/
+    audienceteamstitle/audienceteamsbody (a static two-column block, not an
+    array, so no guard boolean needed); scenariostitle, scenarios (array of
+    problem/outcome) plus a separate hasscenarios boolean; and
+    closingctatitle/closingctaprimarylabel/closingctaprimaryurl/
+    closingctasecondarylabel/closingctasecondaryurl.
+
+    The hascourses/hastestimonials/hasvalueprops/hasscenarios booleans exist
+    because Mustache sections have only one behavior for an array: repeat
+    the block once per element. Wrapping a whole section (heading included)
+    directly in a courses or testimonials section tag is not an "if
+    non-empty" guard — with 3 testimonials it rendered that entire section,
+    heading and all, 3 times on the live site. Only the courses section
+    looked fine, coincidentally, because there was exactly 1 course to
+    iterate. The outer guard and the inner loop must use different keys,
+    never the same tag twice.
 
     NOTE: deliberately described in prose above, not as a literal JSON
     example — a nested JSON object here previously produced two adjacent
@@ -35,6 +44,19 @@
     comment block, quoted or not.
 }}
 <div class="erasight-landing">
+    {{#hasvalueprops}}
+    <div class="erasight-landing-section">
+        <div class="erasight-valueprops">
+            {{#valueprops}}
+            <div class="erasight-valueprop">
+                <h4>{{title}}</h4>
+                <p>{{body}}</p>
+            </div>
+            {{/valueprops}}
+        </div>
+    </div>
+    {{/hasvalueprops}}
+
     {{#hascourses}}
     <div class="erasight-landing-section">
         <div class="erasight-landing-head">
@@ -57,6 +79,19 @@
     </div>
     {{/hascourses}}
 
+    <div class="erasight-landing-section">
+        <div class="erasight-audience">
+            <div class="erasight-audience-col">
+                <h4>{{audienceindividualstitle}}</h4>
+                <p>{{audienceindividualsbody}}</p>
+            </div>
+            <div class="erasight-audience-col">
+                <h4>{{audienceteamstitle}}</h4>
+                <p>{{audienceteamsbody}}</p>
+            </div>
+        </div>
+    </div>
+
     {{#hastestimonials}}
     <div class="erasight-landing-section erasight-landing-section-alt">
         <div class="erasight-landing-head"><h3>{{feedbacktitle}}</h3></div>
@@ -74,6 +109,20 @@
     </div>
     {{/hastestimonials}}
 
+    {{#hasscenarios}}
+    <div class="erasight-landing-section erasight-landing-section-alt">
+        <div class="erasight-landing-head"><h3>{{scenariostitle}}</h3></div>
+        <div class="erasight-scenario-grid">
+            {{#scenarios}}
+            <div class="erasight-scenario-card">
+                <div class="erasight-scenario-problem">{{problem}}</div>
+                <div class="erasight-scenario-outcome">{{outcome}}</div>
+            </div>
+            {{/scenarios}}
+        </div>
+    </div>
+    {{/hasscenarios}}
+
     <div class="erasight-landing-section">
         <div class="erasight-teams-band">
             <div>
@@ -81,6 +130,14 @@
                 <p>{{teamsbody}}</p>
                 <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{teamsctaurl}}">{{teamscta}}</a>
             </div>
+        </div>
+    </div>
+
+    <div class="erasight-landing-section erasight-closing-cta">
+        <h3>{{closingctatitle}}</h3>
+        <div class="erasight-hero-cta">
+            <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{closingctaprimaryurl}}">{{closingctaprimarylabel}}</a>
+            <a class="erasight-hero-btn erasight-hero-btn-secondary-alt" href="{{closingctasecondaryurl}}">{{closingctasecondarylabel}}</a>
         </div>
     </div>
 </div>

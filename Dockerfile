@@ -1,6 +1,7 @@
-# Moodle 4.5 LTS, self-built (no maintained free Docker image exists anymore —
-# bitnami/moodle moved to a paid "Bitnami Secure Images" subscription in 2026,
-# and the official moodlehq/moodle-docker repo is explicitly dev/test-only).
+# Moodle 5.2 (latest stable — upgraded from 4.5 LTS), self-built (no
+# maintained free Docker image exists anymore — bitnami/moodle moved to a
+# paid "Bitnami Secure Images" subscription in 2026, and the official
+# moodlehq/moodle-docker repo is explicitly dev/test-only).
 #
 # One image, reused by all three compose services (moodle, moodle-install,
 # moodle-cron) with different `command:` overrides — there's nothing to build
@@ -11,8 +12,20 @@
 
 FROM alpine/git:latest AS fetch
 WORKDIR /src
-# MOODLE_405_STABLE = the 4.5.x LTS branch (supported through Oct 2027).
-RUN git clone --depth=1 --branch MOODLE_405_STABLE https://github.com/moodle/moodle.git .
+# MOODLE_502_STABLE = the latest stable release (5.2) as of this upgrade,
+# confirmed directly against github.com/moodle/moodle's real branch list —
+# previously MOODLE_405_STABLE (4.5 LTS). Moodle 5.1 restructured the
+# webroot: most of the codebase (including every plugin directory) now
+# lives under a new public/ subdirectory, confirmed by direct checks against
+# the real MOODLE_500_STABLE/501_STABLE/502_STABLE branches (e.g.
+# theme/boost/config.php is 404 at the old root path, 200 under
+# public/theme/boost/config.php on 5.1+). config.php and admin/cli/* stay
+# at the repo root unchanged — Moodle's own official 5.1 restructure guide
+# confirms $CFG->dirroot/$CFG->wwwroot behave as before, and a real
+# backward-compat shim at the old root lib/setup.php bridges through to the
+# real code now under public/lib/setup.php. See the COPY destinations and
+# the Apache DocumentRoot change below for what this actually requires.
+RUN git clone --depth=1 --branch MOODLE_502_STABLE https://github.com/moodle/moodle.git .
 
 # webservice_mcp: a third-party (not Moodle core, not ours) plugin exposing
 # Moodle's external services as an MCP server for AI assistants — cloned
@@ -49,14 +62,29 @@ RUN a2enmod rewrite
 COPY --from=fetch /src /var/www/html
 # Our theme and the catalog page are plugins, not core edits — added into
 # the freshly-cloned tree rather than committed to the fetch stage's
-# checkout, so they survive every future MOODLE_405_STABLE re-clone unchanged.
-COPY docker/theme-erasight /var/www/html/theme/erasight
-COPY docker/local-erasight /var/www/html/local/erasight
-COPY --from=fetch /src-webservice-mcp /var/www/html/webservice/mcp
+# checkout, so they survive every future MOODLE_502_STABLE re-clone unchanged.
+# Destinations are under public/ — confirmed by direct HTTP checks that
+# plugin directories physically moved there in 5.1+, with no compatibility
+# shim (unlike config.php/admin/cli, which stayed at the repo root).
+COPY docker/theme-erasight /var/www/html/public/theme/erasight
+COPY docker/local-erasight /var/www/html/public/local/erasight
+COPY --from=fetch /src-webservice-mcp /var/www/html/public/webservice/mcp
 COPY docker/config.php /var/www/html/config.php
 COPY docker/install-database.sh /usr/local/bin/install-database.sh
 COPY docker/cron-loop.sh /usr/local/bin/cron-loop.sh
 RUN chmod +x /usr/local/bin/install-database.sh /usr/local/bin/cron-loop.sh
+
+# Apache's DocumentRoot must point at public/ on 5.1+ — the old root-level
+# index.php now deliberately throws an error telling you to do exactly this
+# (confirmed by reading its real source: throw new
+# \core\exception\moodle_exception('rootdirpublic', 'error')). Matches the
+# exact change Moodle's own official restructure guide gives as the example
+# (DocumentRoot /srv/moodle/public). admin/cli/* and config.php are
+# unaffected since they were never served through DocumentRoot in the first
+# place — this only needs to touch where Apache resolves incoming HTTP
+# requests from, not where PHP CLI scripts get invoked from.
+RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' \
+      /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf
 
 RUN mkdir -p /var/moodledata \
     && chown -R www-data:www-data /var/moodledata /var/www/html \

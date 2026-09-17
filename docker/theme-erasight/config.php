@@ -31,9 +31,19 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 // lib.php's SCSS callbacks read (theme_erasight_is_dark()).
 $THEME->hassettings = true;
 
-// $THEME->layouts (frontpage/mydashboard/mycourses overrides) intentionally
-// NOT added yet — rebuild Phase 1/2 checkpoint deploys with Boost's own
-// default layouts still in effect, so there's nothing here referencing
-// layout/*.php files that don't exist yet (Phase 3/5 add them, and this
-// override, back). Deploying with a layout override pointing at a
-// non-existent file would fatal the front page.
+// Overrides ONLY the 'frontpage' layout key for now (rebuild Phase 3) —
+// mydashboard/mycourses come back in Phase 5, once their layout files
+// exist; every other layout key ('course', 'admin', 'standard', 'login',
+// etc.) cascades straight from Boost's own $THEME->layouts, confirmed
+// unchanged by this rebuild. Regions/options copied verbatim from Boost's
+// real 5.2 config.php — only 'file' differs, since that file is what
+// renders the hero (and, once Phase 4 lands, the landing/storefront
+// content below it).
+$THEME->layouts = [
+    'frontpage' => [
+        'file' => 'frontpage.php',
+        'regions' => ['side-pre'],
+        'defaultregion' => 'side-pre',
+        'options' => ['nonavbar' => true],
+    ],
+];

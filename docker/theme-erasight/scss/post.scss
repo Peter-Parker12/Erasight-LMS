@@ -124,3 +124,139 @@ h1, h2, .navbar-brand {
     color: var(--erasight-ink);
   }
 }
+
+// Front-page hero. towardsai.com-style left-aligned, emphasized-word
+// headline. Every text element's color/opacity is picked for contrast
+// against BOTH ends of the gradient below (a saturated blue at the
+// top-left origin, near-black at 70%), decided here alongside the
+// background rather than audited for readability as a later pass.
+.erasight-hero {
+  background: radial-gradient(120% 160% at 15% 0%, var(--erasight-sky-deep), var(--erasight-umber) 70%);
+  color: #fff;
+  padding: 4rem 1.5rem;
+  margin: -1.5rem -1.5rem 1.5rem;
+}
+
+.erasight-hero-inner {
+  max-width: 720px;
+  margin: 0;
+  text-align: left;
+}
+
+.erasight-hero-eyebrow {
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .75;
+  margin-bottom: .9rem;
+}
+
+.erasight-hero-title {
+  font-family: var(--erasight-font-display);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 800;
+  margin-bottom: .75rem;
+}
+
+.erasight-emphasis {
+  // Ember, not sky — the headline sits near the gradient's blue end (its
+  // origin is the same top-left corner as this left-aligned text), so a
+  // warm accent reads with far stronger contrast there than another blue
+  // would. Same accent already used for CTAs/prices elsewhere.
+  font-style: italic;
+  color: var(--erasight-ember);
+}
+
+.erasight-hero-tagline {
+  font-size: 1.05rem;
+  // .95, not a lower opacity — this sits directly on the gradient, where
+  // reduced-opacity white was noticeably harder to read on the lighter
+  // (blue) half than the darker half.
+  opacity: .95;
+  margin-bottom: 1.75rem;
+}
+
+.erasight-hero-cta {
+  display: flex;
+  justify-content: flex-start;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.erasight-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: .9rem;
+  padding: .7rem 1.4rem;
+  border-radius: $border-radius-lg;
+  text-decoration: none;
+  transition: transform .15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+}
+
+.erasight-hero-btn-primary {
+  background: var(--erasight-ember);
+  color: #fff;
+}
+
+.erasight-hero-btn-secondary {
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .35);
+  color: #fff;
+}
+
+// A second "secondary" style for bands that sit on the page's normal
+// surface color, not the hero's dark gradient — the white-on-transparent
+// treatment above would be invisible there.
+.erasight-hero-btn-secondary-alt {
+  background: transparent;
+  border: 1px solid var(--erasight-mist);
+  color: var(--erasight-ink);
+}
+
+.erasight-hero-stats {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2.5rem;
+}
+
+.erasight-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.erasight-hero-stat-value {
+  font-family: var(--erasight-font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.erasight-hero-stat-label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .88;
+}
+
+// Moodle's own core /index.php unconditionally adds a 'limitedwidth' body
+// class for the site front page (confirmed in real index.php on
+// MOODLE_502_STABLE — not a theme or layout concern, so nothing in
+// config.php can fix it), which Boost's own layout.scss uses to cap
+// #page.drawers .main-inner to a narrow readable width. Overridden here,
+// scoped to .pagelayout-frontpage only, so every other limitedwidth page
+// (course index, user preferences, etc.) keeps its normal readable width
+// cap — only this storefront-style landing page goes edge-to-edge. The
+// hero above has its own internal max-width (720px) for readable text, so
+// removing this outer constraint lets only the background gradient go
+// full-bleed, not the copy itself.
+body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
+  max-width: none;
+}

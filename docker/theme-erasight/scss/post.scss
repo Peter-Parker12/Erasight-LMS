@@ -834,3 +834,18 @@ body.pagelayout-course {
   max-width: 64ch;
   margin-bottom: 2rem;
 }
+
+// Phase 12 — full-bleed front page. Moodle's own core /index.php
+// unconditionally calls $PAGE->add_body_class('limitedwidth') for the site
+// front page (confirmed in the real index.php on MOODLE_405_STABLE — not
+// something a theme or layout controls, so it can't be fixed by an option
+// in config.php). Boost's own layout.scss then caps #page.drawers
+// .main-inner to $course-content-maxwidth for any body.limitedwidth,
+// which is what boxed the storefront hero/landing content into a narrow
+// centered column against a dark surround. Overridden here scoped to
+// .pagelayout-frontpage only, so every other limitedwidth page (course
+// index, user preferences, etc.) keeps its normal readable width cap —
+// only this storefront-style landing page goes edge-to-edge.
+body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
+  max-width: none;
+}

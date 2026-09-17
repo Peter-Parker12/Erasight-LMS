@@ -222,6 +222,20 @@ $templatecontext = [
     'addblockbutton' => $addblockbutton,
     'herohtml' => $herohtml,
     'landinghtml' => $landinghtml,
+    // 'nonavbar' in config.php's $THEME->layouts['frontpage'] does NOT do
+    // what its name suggests — confirmed against real MOODLE_405_STABLE
+    // source: core_renderer::full_header() reads it only to set
+    // $header->hasnavbar, which controls a secondary in-page header
+    // component, not the persistent top <nav class="navbar"> bar (that
+    // comes from the theme_boost/navbar partial, included unconditionally
+    // by drawers.mustache — and by our own frontpage.mustache, copied from
+    // it — regardless of any layout option). That top bar is a real,
+    // separate piece of chrome this storefront-style landing page doesn't
+    // want, so it's suppressed here directly via this own flag, scoped to
+    // ONLY this layout (mydashboard.php/mycourses.php build their own
+    // separate $templatecontext and don't set this, so logged-in users
+    // still get normal navigation there).
+    'hidenavbar' => true,
 ];
 
 echo $OUTPUT->render_from_template('theme_erasight/frontpage', $templatecontext);

@@ -11,6 +11,10 @@
     simpler "banner" template instead of "hero" — "landinghtml" stays empty
     there, which Mustache renders as nothing, not an error).
 
+    hidenavbar (bool, optional) suppresses the persistent top site nav bar
+    entirely — only layout/frontpage.php sets this, so mydashboard.php and
+    mycourses.php keep normal navigation for logged-in users.
+
     NOTE: never write two closing-brace characters next to each other
     anywhere in this comment block, quoted or not — a Mustache comment
     ends at the first such occurrence it scans past, not a matched or
@@ -26,7 +30,7 @@
 
     {{{ output.standard_top_of_body_html }}}
 
-    {{> theme_boost/navbar }}
+    {{^hidenavbar}}{{> theme_boost/navbar }}{{/hidenavbar}}
     {{#courseindex}}
         {{< theme_boost/drawer }}
             {{$id}}theme_boost-drawers-courseindex{{/id}}

@@ -135,14 +135,37 @@ $herohtml = $OUTPUT->render_from_template('theme_erasight/hero', [
 require_once($CFG->dirroot . '/local/erasight/lib.php');
 
 $landingcourses = [];
-$rawcourses = core_course_category::top()->get_courses(['recursive' => true, 'limit' => 6]);
+// 'summary' => true requested explicitly: core_course_category::get_courses()
+// only returns the real course summary/summaryformat fields when asked for
+// them (confirmed against course/classes/category.php on MOODLE_405_STABLE
+// — without this option the property is left to lazy-load on first access,
+// which works but isn't worth relying on here).
+$rawcourses = core_course_category::top()->get_courses([
+    'recursive' => true,
+    'limit' => 6,
+    'summary' => true,
+]);
 foreach ($rawcourses as $rawcourse) {
     if (!$rawcourse->visible) {
         continue;
     }
+    $category = core_course_category::get($rawcourse->category, IGNORE_MISSING, true);
+    // Plain-text card blurb from the course's real summary — strip_tags()
+    // + a hard character cap, not a fabricated tagline. No native Moodle
+    // helper for this exists (checked; there is no shorten_text() or
+    // equivalent in current core), so it's done directly here.
+    $plainsummary = trim(strip_tags($rawcourse->summary ?? ''));
+    $shortdescription = null;
+    if ($plainsummary !== '') {
+        $shortdescription = mb_strlen($plainsummary) > 140
+            ? mb_substr($plainsummary, 0, 140) . '…'
+            : $plainsummary;
+    }
     $landingcourses[] = (object) [
         'id' => $rawcourse->id,
         'fullname' => format_string($rawcourse->fullname),
+        'category' => $category ? format_string($category->name) : '',
+        'shortdescription' => $shortdescription,
         'courseimage' => local_erasight_get_course_image($rawcourse->id, $OUTPUT),
         'detailurl' => (new moodle_url('/local/erasight/course.php', ['id' => $rawcourse->id]))->out(false),
         'price' => local_erasight_get_course_price($rawcourse->id),

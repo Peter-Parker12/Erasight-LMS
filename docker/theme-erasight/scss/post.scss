@@ -62,6 +62,92 @@
   }
 }
 
+// Phase 16 — sitewide dark-mode surface fix. This closes the "known
+// boundary" flagged since phase 9: overriding $body-bg/$body-color in
+// pre.scss only reaches components whose color is actually DERIVED from
+// those Sass variables at compile time. Moodle's bundled Bootstrap here
+// compiles to static hex values, not runtime CSS custom properties (there
+// is no --bs-body-bg/--bs-card-bg at all — confirmed by inspecting the
+// live compiled stylesheet), and several components — critically the top
+// navbar itself (theme_boost/navbar.mustache literally hardcodes
+// class="navbar-light bg-white" in markup) plus Bootstrap's .card,
+// dropdowns, tables, and form controls — get their color from Bootstrap's
+// OWN variables ($white, $card-bg, etc.), which pre.scss never touched.
+// That's why the top nav bar, the Site administration page header/tabs,
+// and ordinary admin forms/tables stayed white even with dark mode on
+// everywhere else. Fixed here with direct selector overrides (some
+// !important, matching Bootstrap's own .bg-white utility, which is
+// itself !important) rather than hunting down every Bootstrap Sass
+// variable this specific bundled version actually reads.
+@if $erasight-dark {
+  .bg-white, .bg-light {
+    background-color: var(--erasight-surface) !important;
+  }
+
+  .navbar.navbar-light {
+    background-color: var(--erasight-surface) !important;
+    border-color: var(--erasight-mist);
+
+    .navbar-brand, .nav-link, .navbar-toggler-icon {
+      color: var(--erasight-ink) !important;
+    }
+  }
+
+  #page-header {
+    color: var(--erasight-ink);
+  }
+
+  .card {
+    background-color: var(--erasight-surface);
+    color: var(--erasight-ink);
+    border-color: var(--erasight-mist);
+  }
+
+  .dropdown-menu {
+    background-color: var(--erasight-surface);
+    border-color: var(--erasight-mist);
+
+    .dropdown-item {
+      color: var(--erasight-ink);
+
+      &:hover, &:focus {
+        background-color: var(--erasight-mist);
+        color: var(--erasight-ink);
+      }
+    }
+  }
+
+  .table {
+    color: var(--erasight-ink);
+    border-color: var(--erasight-mist);
+
+    th, td {
+      border-color: var(--erasight-mist);
+    }
+  }
+
+  .list-group-item {
+    background-color: var(--erasight-surface);
+    color: var(--erasight-ink);
+    border-color: var(--erasight-mist);
+  }
+
+  .form-control, .form-select, .form-check-input {
+    background-color: var(--erasight-surface);
+    color: var(--erasight-ink);
+    border-color: var(--erasight-mist);
+  }
+
+  .modal-content {
+    background-color: var(--erasight-surface);
+    color: var(--erasight-ink);
+  }
+
+  .breadcrumb-item, .breadcrumb-item a {
+    color: var(--erasight-ink);
+  }
+}
+
 h1, h2, .navbar-brand {
   font-family: var(--erasight-font-display);
 }

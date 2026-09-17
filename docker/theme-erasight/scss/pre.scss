@@ -1,32 +1,30 @@
 // Loaded BEFORE Bootstrap compiles (theme_boost_get_pre_scss) — these are
 // Sass variables, not CSS, so they reach every Bootstrap component Moodle's
-// admin screens are built from (buttons, forms, tables, alerts) automatically.
+// admin screens are built from (buttons, forms, tables, alerts) automatically
+// — but only insofar as those components actually derive their color from
+// these specific variables at compile time. Confirmed on MOODLE_502_STABLE
+// this bundled Bootstrap has NO runtime CSS custom properties (--bs-body-bg
+// etc. do not exist in the compiled output) — Moodle 5.2 does ship a newer
+// "Moodle Design System" token layer (theme/boost/scss/design-system/) with
+// real --mds-* runtime custom properties, but checked directly against this
+// exact branch and confirmed it is NOT yet wired into any compiled component
+// CSS on 5.2 (the file that would define those custom properties,
+// lib/bundles/design-system/scss/tokens/_index_css_vars.scss, 404s here) —
+// that's scaffolding for a later Moodle release, not something to build on
+// yet. So: several components (notably the top nav bar, which
+// theme_boost/navbar.mustache hardcodes class="navbar-light bg-white"
+// directly in markup) will NOT follow $body-bg alone — see post.scss's
+// explicit per-component dark-mode overrides for those.
 //
 // $erasight-dark is set by lib.php's theme_erasight_get_pre_scss(), reading
 // the theme_erasight/colorscheme admin setting (settings.php) — this file
 // doesn't read the setting directly, it's prepended as a plain Sass boolean
 // before this file's own content runs.
-//
-// $primary was originally a neutral near-black (matching the old app's
-// shadcn/ui default) specifically so Site administration stayed quiet/
-// neutral while only student-facing templates got the sky/ember brand
-// accents. That scope decision was later reversed: Home, Dashboard, My
-// courses, and Site administration are now explicitly meant to read as one
-// Udemy-styled brand too — so $primary is the ember accent in both color
-// schemes, which recolors every default Bootstrap primary button/focus-ring/
-// active-nav-indicator site-wide, admin included.
 $primary: #E85D04;
 
 @if $erasight-dark {
-  // Reuses the exact dark palette already designed (and shipped) for the
-  // in-course "cinema mode" sidebar in post.scss's phase 3 — same colors,
-  // now applied site-wide instead of just course pages.
   $body-bg:    #14181D;
   $body-color: #D9DEE5;
-  // Sky-deep (#0D7FA4) was tuned for contrast against a near-white page;
-  // on a near-black one the brighter --erasight-sky reads far more legibly
-  // as a link color, matching what cinema mode already uses for the same
-  // reason.
   $link-color: #1FAEDD;
 } @else {
   $body-bg:    #FBF9F6;

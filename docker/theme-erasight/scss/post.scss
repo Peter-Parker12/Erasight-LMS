@@ -405,6 +405,16 @@ body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
   max-width: none;
 }
 
+// Boost Union's own .main-inner carries a top margin+padding meant to
+// separate content from the persistent navbar above it — dead space on
+// this layout, since hidenavbar removes that navbar entirely. Zeroed
+// here so the hero starts flush with the viewport top instead of behind
+// an empty gap.
+body.pagelayout-frontpage #page.drawers .main-inner {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 // Landing sections below the hero — towardsai.com-style editorial spacing
 // and card language, reused as-is from the pre-rebase build (none of this
 // depended on being a direct Boost child).

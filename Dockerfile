@@ -35,6 +35,19 @@ RUN git clone --depth=1 --branch MOODLE_502_STABLE https://github.com/moodle/moo
 # the one other fork on GitHub, which has zero commits beyond it.
 RUN git clone --depth=1 https://github.com/onbirdev/moodle-webservice_mcp.git /src-webservice-mcp
 
+# Boost Union: theme_erasight's new parent theme, replacing raw Boost after
+# evaluating real GitHub theme repos for Moodle 5.x compatibility this
+# session — Adaptable had no MOODLE_50x_STABLE branch at all, Moove tracked
+# only through 5.1, Boost Union had an exact MOODLE_502_STABLE branch match
+# and was pushed the same day this was written. GPL-3.0, same license as
+# everything else in this install — cloned fresh here, never vendored/
+# edited directly, same pattern as webservice_mcp above and Moodle core
+# itself: this repo's own customization lives entirely in theme_erasight,
+# which extends Boost Union via real, documented extension points
+# (confirmed against the official moodle-theme_boost_union_child
+# boilerplate before writing theme_erasight's config.php/lib.php).
+RUN git clone --depth=1 --branch MOODLE_502_STABLE https://github.com/moodle-an-hochschulen/moodle-theme_boost_union.git /src-boost-union
+
 FROM php:8.3-apache AS runtime
 WORKDIR /var/www/html
 
@@ -60,6 +73,11 @@ COPY docker/php-moodle.ini /usr/local/etc/php/conf.d/zz-moodle.ini
 RUN a2enmod rewrite
 
 COPY --from=fetch /src /var/www/html
+# Boost Union (theme_erasight's parent theme) copied in BEFORE theme_erasight
+# itself, matching real-plugin-dependency order even though Moodle's own
+# plugin loading doesn't strictly require it — makes the "erasight depends
+# on boost_union" relationship visible in this file, not just implied.
+COPY --from=fetch /src-boost-union /var/www/html/public/theme/boost_union
 # Our theme and the catalog page are plugins, not core edits — added into
 # the freshly-cloned tree rather than committed to the fetch stage's
 # checkout, so they survive every future MOODLE_502_STABLE re-clone unchanged.

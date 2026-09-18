@@ -1,14 +1,24 @@
 <?php
-// Delegates to theme_boost's own SCSS callbacks (verified fresh against
-// theme/boost/lib.php on MOODLE_502_STABLE — same function names/signatures
-// as before) and appends our own partials on top — the documented way to
-// extend a parent theme's SCSS pipeline without touching boost itself.
+// Delegates to theme_boost_union's own SCSS callbacks (function names
+// verified fresh against theme/boost_union/lib.php on MOODLE_502_STABLE:
+// theme_boost_union_get_main_scss_content/_get_pre_scss/_get_extra_scss)
+// and appends our own partials on top — the same pattern the real
+// boost_union_child boilerplate uses (fetched and read in full before
+// writing this), adapted since our SCSS itself doesn't depend on any
+// Boost-Union-specific settings the way the boilerplate's inheritance
+// toggle exists to guard against.
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/theme/boost/lib.php');
+require_once($CFG->dirroot . '/theme/boost_union/lib.php');
 
 function theme_erasight_get_main_scss_content($theme) {
-    return theme_boost_get_main_scss_content($theme);
+    global $CFG;
+
+    // As a start, get the compiled main SCSS from Boost Union — this way
+    // this theme ships the same base SCSS Boost Union itself does.
+    $scss = theme_boost_union_get_main_scss_content(\core\output\theme_config::load('boost_union'));
+
+    return $scss;
 }
 
 // Both pre.scss and post.scss branch on a plain Sass boolean, $erasight-dark,
@@ -20,21 +30,36 @@ function theme_erasight_is_dark($theme) {
 
 function theme_erasight_get_pre_scss($theme) {
     global $CFG;
-    $scss = theme_boost_get_pre_scss($theme);
-    $scss .= '$erasight-dark: ' . (theme_erasight_is_dark($theme) ? 'true' : 'false') . ";\n";
+
+    // Deliberately does NOT explicitly re-call theme_boost_union_get_pre_scss()
+    // here — confirmed against lib/classes/output/theme_config.php this
+    // session (get_pre_scss_code() walks $this->parent_configs and calls
+    // every parent's own prescsscallback automatically) that Moodle already
+    // includes Boost Union's pre-SCSS via the normal parent-chain mechanism
+    // once $THEME->parents = ['boost_union', 'boost'] is set — calling it
+    // again here would double-include it. The real boost_union_child
+    // boilerplate DOES re-call it explicitly, but only as an opt-in
+    // workaround for a specific edge case (Boost Union reading
+    // $theme->settings and getting this theme's settings instead of its
+    // own if invoked via the automatic chain) — not something to defend
+    // against from day one without evidence this theme actually hits it.
+    $scss = '$erasight-dark: ' . (theme_erasight_is_dark($theme) ? 'true' : 'false') . ";\n";
     $scss .= file_get_contents($CFG->dirroot . '/theme/erasight/scss/pre.scss');
     return $scss;
 }
 
 function theme_erasight_get_extra_scss($theme) {
     global $CFG;
-    $scss = theme_boost_get_extra_scss($theme);
-    $scss .= '$erasight-dark: ' . (theme_erasight_is_dark($theme) ? 'true' : 'false') . ";\n";
+
+    // Same reasoning as theme_erasight_get_pre_scss() above — Boost
+    // Union's own extra-SCSS is already included via Moodle's automatic
+    // parent-chain walk, not re-called explicitly here.
+    $scss = '$erasight-dark: ' . (theme_erasight_is_dark($theme) ? 'true' : 'false') . ";\n";
     $scss .= file_get_contents($CFG->dirroot . '/theme/erasight/scss/post.scss');
     return $scss;
 }
 
-// Google Fonts <link> tags, sitewide (not just the 3 forked layouts).
+// Google Fonts <link> tags, sitewide (not just the front page).
 // Deliberately NOT an SCSS @import — a remote-URL @import compiles fine
 // under dart-sass locally but broke this exact theme's entire compiled CSS
 // in production once already: Moodle's bundled scssphp compiler tries to

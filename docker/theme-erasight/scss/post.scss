@@ -105,6 +105,21 @@ h1, h2, .navbar-brand {
     color: var(--erasight-ink) !important;
   }
 
+  // Boost Union's own compiled CSS hardcodes "#page.drawers .main-inner"
+  // to "background-color:#fff" directly — confirmed live by fetching the
+  // deployed stylesheet, not guessed. .main-inner wraps EVERY page's
+  // content, so this single hardcoded white was the real source of two
+  // separate-looking symptoms: thin white slivers flanking the front
+  // page content (its own small .5rem side padding showing the white
+  // through), and a white strip above the dashboard's header card (its
+  // rounded top corners + margin showing through). Same bug class as
+  // .bg-white/#page-header/.card above, just not discovered until now
+  // because it only shows at the few px this container isn't fully
+  // covered by something else's own background.
+  #page.drawers .main-inner {
+    background-color: var(--erasight-bg) !important;
+  }
+
   #page-header {
     background-color: var(--erasight-surface) !important;
     color: var(--erasight-ink) !important;

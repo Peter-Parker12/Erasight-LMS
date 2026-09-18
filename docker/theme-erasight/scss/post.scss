@@ -382,10 +382,48 @@ body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
   margin-bottom: .4rem;
 }
 
-.erasight-step p {
-  font-size: .88rem;
-  line-height: 1.6;
-  opacity: .85;
+// Shared checkmark language — used by the process steps, the segment
+// cards, the value props, and the scenario outcomes, so a checkmark means
+// the same thing (a real, delivered result) everywhere it appears on the
+// page, matching towardsai.com's checkmark-bullet pattern.
+.erasight-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    position: relative;
+    padding-left: 1.3rem;
+    font-size: .88rem;
+    line-height: 1.6;
+    opacity: .85;
+    margin-bottom: .4rem;
+
+    &::before {
+      content: '\2713';
+      position: absolute;
+      left: 0;
+      color: var(--erasight-ember);
+      font-weight: 700;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.erasight-checkline {
+  position: relative;
+  padding-left: 1.3rem;
+
+  &::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--erasight-ember);
+    font-weight: 700;
+  }
 }
 
 .erasight-landing-section-alt {
@@ -504,29 +542,58 @@ body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
   color: var(--erasight-ember);
 }
 
-.erasight-audience {
+// Three-way segment cards (Individuals / Teams / Enterprise) — heading +
+// checklist + link, matching towardsai.com's "three ways we help" card
+// pattern structurally, in Erasight's own colors/type.
+.erasight-segments {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
-.erasight-audience-col {
+.erasight-segment {
   border: 1px solid var(--erasight-mist);
   border-radius: $border-radius-lg;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.erasight-audience-col h4 {
+.erasight-segment h4 {
   font-family: var(--erasight-font-display);
   font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: .5rem;
+  margin-bottom: .9rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
 }
 
-.erasight-audience-col p {
-  font-size: .88rem;
-  line-height: 1.6;
-  opacity: .85;
+.erasight-segment-badge {
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--erasight-sky-deep);
+  background: var(--erasight-sky-tint);
+  padding: .15rem .5rem;
+  border-radius: 999px;
+}
+
+.erasight-segment .erasight-checklist {
+  flex: 1;
+  margin-bottom: 1.1rem;
+}
+
+.erasight-segment-link {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--erasight-sky-deep);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .erasight-testimonial-grid {

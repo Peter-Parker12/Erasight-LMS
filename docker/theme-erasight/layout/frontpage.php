@@ -335,22 +335,34 @@ $steps = [
     (object) [
         'number' => 1,
         'title' => get_string('step1_title', 'theme_erasight'),
-        'body' => get_string('step1_body', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('step1_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('step1_bullet2', 'theme_erasight')],
+        ],
     ],
     (object) [
         'number' => 2,
         'title' => get_string('step2_title', 'theme_erasight'),
-        'body' => get_string('step2_body', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('step2_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('step2_bullet2', 'theme_erasight')],
+        ],
     ],
     (object) [
         'number' => 3,
         'title' => get_string('step3_title', 'theme_erasight'),
-        'body' => get_string('step3_body', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('step3_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('step3_bullet2', 'theme_erasight')],
+        ],
     ],
     (object) [
         'number' => 4,
         'title' => get_string('step4_title', 'theme_erasight'),
-        'body' => get_string('step4_body', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('step4_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('step4_bullet2', 'theme_erasight')],
+        ],
     ],
 ];
 
@@ -391,6 +403,48 @@ $teamsctaurl = !empty($CFG->supportemail)
     ? 'mailto:' . $CFG->supportemail
     : (new moodle_url('/local/erasight/catalog.php'))->out(false);
 
+$catalogurl = (new moodle_url('/local/erasight/catalog.php'))->out(false);
+
+// Three real buyer segments, styled as heading + bullets + link cards
+// (towardsai.com's "three ways we help" pattern). Enterprise reuses the
+// same contact mechanism as the team CTA — there's no separate enterprise
+// sales flow yet, so this doesn't invent one.
+$segments = [
+    (object) [
+        'title' => get_string('audience_individuals_title', 'theme_erasight'),
+        'badge' => null,
+        'bullets' => [
+            (object) ['text' => get_string('audience_individuals_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('audience_individuals_bullet2', 'theme_erasight')],
+            (object) ['text' => get_string('audience_individuals_bullet3', 'theme_erasight')],
+        ],
+        'cta' => get_string('audience_individuals_cta', 'theme_erasight'),
+        'ctaurl' => $catalogurl,
+    ],
+    (object) [
+        'title' => get_string('audience_teams_title', 'theme_erasight'),
+        'badge' => null,
+        'bullets' => [
+            (object) ['text' => get_string('audience_teams_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('audience_teams_bullet2', 'theme_erasight')],
+            (object) ['text' => get_string('audience_teams_bullet3', 'theme_erasight')],
+        ],
+        'cta' => get_string('audience_teams_cta', 'theme_erasight'),
+        'ctaurl' => $teamsctaurl,
+    ],
+    (object) [
+        'title' => get_string('audience_enterprise_title', 'theme_erasight'),
+        'badge' => get_string('audience_enterprise_badge', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('audience_enterprise_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('audience_enterprise_bullet2', 'theme_erasight')],
+            (object) ['text' => get_string('audience_enterprise_bullet3', 'theme_erasight')],
+        ],
+        'cta' => get_string('audience_enterprise_cta', 'theme_erasight'),
+        'ctaurl' => $teamsctaurl,
+    ],
+];
+
 $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
     'howitworkstitle' => get_string('howitworks_title', 'theme_erasight'),
     'steps' => $steps,
@@ -405,10 +459,8 @@ $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
     'populartitle' => get_string('landing_popular', 'theme_erasight'),
     'viewalllabel' => get_string('landing_viewall', 'theme_erasight'),
     'viewallurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
-    'audienceindividualstitle' => get_string('audience_individuals_title', 'theme_erasight'),
-    'audienceindividualsbody' => get_string('audience_individuals_body', 'theme_erasight'),
-    'audienceteamstitle' => get_string('audience_teams_title', 'theme_erasight'),
-    'audienceteamsbody' => get_string('audience_teams_body', 'theme_erasight'),
+    'segments' => $segments,
+    'hassegments' => !empty($segments),
     'feedbacktitle' => get_string('landing_feedback', 'theme_erasight'),
     'hastestimonials' => !empty($testimonials),
     'testimonials' => $testimonials,

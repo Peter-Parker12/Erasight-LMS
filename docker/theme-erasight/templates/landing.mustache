@@ -8,14 +8,15 @@
     since that shared template also renders on the dashboard/catalog where a
     price shouldn't appear for an already-enrolled student.
 
-    Context: howitworkstitle, steps (array of number/title/body) plus a
-    separate hashowitworks boolean. courses (array of id/fullname/category/shortdescription/
+    Context: howitworkstitle, steps (array of number/title/bullets, where
+    bullets is itself an array of objects each holding one "text" string)
+    plus a separate hashowitworks boolean. courses (array of id/fullname/category/shortdescription/
     courseimage/detailurl/price, where price is itself an object with a
     "formatted" string, or absent) plus a separate hascourses boolean,
     populartitle/viewalllabel/viewallurl. valueprops (array of title/body)
-    plus a separate hasvalueprops boolean. audienceindividualstitle/
-    audienceindividualsbody/audienceteamstitle/audienceteamsbody (a static
-    two-column block, not an array, so no guard boolean needed).
+    plus a separate hasvalueprops boolean. segments (array of title/badge/
+    bullets/cta/ctaurl — badge is null except on the enterprise segment)
+    plus a separate hassegments boolean.
     feedbacktitle, testimonials (array of quote/name/role/initials) plus a
     separate hastestimonials boolean. scenariostitle, scenarios (array of
     problem/outcome) plus a separate hasscenarios boolean.
@@ -47,7 +48,9 @@
             <div class="erasight-step">
                 <div class="erasight-step-number">{{number}}</div>
                 <h4>{{title}}</h4>
-                <p>{{body}}</p>
+                <ul class="erasight-checklist">
+                    {{#bullets}}<li>{{text}}</li>{{/bullets}}
+                </ul>
             </div>
             {{/steps}}
         </div>
@@ -60,7 +63,7 @@
             {{#valueprops}}
             <div class="erasight-valueprop">
                 <h4>{{title}}</h4>
-                <p>{{body}}</p>
+                <p class="erasight-checkline">{{body}}</p>
             </div>
             {{/valueprops}}
         </div>
@@ -89,18 +92,21 @@
     </div>
     {{/hascourses}}
 
+    {{#hassegments}}
     <div class="erasight-landing-section">
-        <div class="erasight-audience">
-            <div class="erasight-audience-col">
-                <h4>{{audienceindividualstitle}}</h4>
-                <p>{{audienceindividualsbody}}</p>
+        <div class="erasight-segments">
+            {{#segments}}
+            <div class="erasight-segment">
+                <h4>{{title}}{{#badge}}<span class="erasight-segment-badge">{{badge}}</span>{{/badge}}</h4>
+                <ul class="erasight-checklist">
+                    {{#bullets}}<li>{{text}}</li>{{/bullets}}
+                </ul>
+                <a class="erasight-segment-link" href="{{ctaurl}}">{{cta}} &rarr;</a>
             </div>
-            <div class="erasight-audience-col">
-                <h4>{{audienceteamstitle}}</h4>
-                <p>{{audienceteamsbody}}</p>
-            </div>
+            {{/segments}}
         </div>
     </div>
+    {{/hassegments}}
 
     {{#hastestimonials}}
     <div class="erasight-landing-section erasight-landing-section-alt">
@@ -126,7 +132,7 @@
             {{#scenarios}}
             <div class="erasight-scenario-card">
                 <div class="erasight-scenario-problem">{{problem}}</div>
-                <div class="erasight-scenario-outcome">{{outcome}}</div>
+                <div class="erasight-scenario-outcome erasight-checkline">{{outcome}}</div>
             </div>
             {{/scenarios}}
         </div>

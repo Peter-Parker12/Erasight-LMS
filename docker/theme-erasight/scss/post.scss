@@ -175,6 +175,66 @@ h1, h2, .navbar-brand {
     color: var(--erasight-ink) !important;
   }
 
+  // Site administration's tab bar (.nav-tabs, e.g. General/Users/Courses/…)
+  // — found live: its border-bottom is Bootstrap's own $border-color, a
+  // light gray that reads as a stray white line under the tabs on a dark
+  // page. Same fix as everywhere else: pin it to the dark-mode border token.
+  .nav-tabs {
+    border-bottom-color: var(--erasight-mist) !important;
+
+    .nav-link {
+      color: var(--erasight-ink) !important;
+      border-color: transparent !important;
+
+      &.active {
+        background-color: transparent !important;
+        border-color: var(--erasight-mist) var(--erasight-mist) var(--erasight-bg) !important;
+      }
+
+      &:hover {
+        border-color: var(--erasight-mist) !important;
+      }
+    }
+  }
+
+  // Bootstrap 5.3's alert/subtle-background colors are pale tints meant
+  // for a white page, and only flip to a dark-appropriate shade via its
+  // OWN native color-mode attribute ([data-bs-theme="dark"] on the html
+  // root) — which Erasight's dark mode never sets, since it's a separate
+  // SCSS-variable-driven toggle, not Bootstrap's built-in one. Left
+  // unpatched, this is exactly the same "background independent of
+  // $body-bg" bug class as everything else in this block, just coming
+  // from Bootstrap's own color-mode system instead of a hardcoded class.
+  // Found live: a pale pink alert box on Site administration > Users.
+  .alert {
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
+  }
+
+  .alert-success, .bg-success-subtle {
+    background-color: rgba(25, 135, 84, .18) !important;
+  }
+
+  .alert-danger, .bg-danger-subtle {
+    background-color: rgba(220, 53, 69, .18) !important;
+  }
+
+  .alert-warning, .bg-warning-subtle {
+    background-color: rgba(255, 193, 7, .16) !important;
+  }
+
+  .alert-info, .bg-info-subtle {
+    background-color: rgba(13, 202, 240, .16) !important;
+  }
+
+  .bg-primary-subtle {
+    background-color: var(--erasight-ember-tint) !important;
+  }
+
+  .bg-secondary-subtle {
+    background-color: var(--erasight-mist) !important;
+  }
+
   // Dashboard/My courses welcome band and any other block-region card —
   // confirmed live (not predicted) that #page-header's own real background
   // comes from a .card it wraps on these pages, already covered by the

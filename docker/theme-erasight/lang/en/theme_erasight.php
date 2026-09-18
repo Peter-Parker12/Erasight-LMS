@@ -43,6 +43,18 @@ $string['valueprop2_body'] = 'Every course has a real instructor behind it, not 
 $string['valueprop3_title'] = 'Progress you can actually see';
 $string['valueprop3_body'] = 'Track completions and enrolment the same way you\'d track any other team metric.';
 
+// "How it works" — a real 4-step description of Erasight's own browse →
+// enrol → learn → track flow, not a fabricated methodology.
+$string['howitworks_title'] = 'How it works';
+$string['step1_title'] = 'Browse the catalog';
+$string['step1_body'] = 'See every course, its real price, and what it covers — no login required.';
+$string['step2_title'] = 'Enrol';
+$string['step2_body'] = 'Pay once and you\'re in — no manager approval or sales call to wait on.';
+$string['step3_title'] = 'Learn at your pace';
+$string['step3_body'] = 'Work through the course around your real schedule, not a fixed cohort start date.';
+$string['step4_title'] = 'Track completion';
+$string['step4_body'] = 'Your progress — and your team\'s — is visible the moment it happens.';
+
 // Audience section — a static two-column block, not interactive tabs.
 $string['audience_individuals_title'] = 'For individuals';
 $string['audience_individuals_body'] = 'Browse the catalog, enrol in what\'s useful to you right now, and learn on your own schedule — no manager sign-off needed to get started.';

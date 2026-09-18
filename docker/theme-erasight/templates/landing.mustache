@@ -8,7 +8,8 @@
     since that shared template also renders on the dashboard/catalog where a
     price shouldn't appear for an already-enrolled student.
 
-    Context: courses (array of id/fullname/category/shortdescription/
+    Context: howitworkstitle, steps (array of number/title/body) plus a
+    separate hashowitworks boolean. courses (array of id/fullname/category/shortdescription/
     courseimage/detailurl/price, where price is itself an object with a
     "formatted" string, or absent) plus a separate hascourses boolean,
     populartitle/viewalllabel/viewallurl. valueprops (array of title/body)
@@ -38,6 +39,21 @@
     reason, permanently.
 }}
 <div class="erasight-landing">
+    {{#hashowitworks}}
+    <div class="erasight-landing-section">
+        <div class="erasight-landing-head"><h3>{{howitworkstitle}}</h3></div>
+        <div class="erasight-steps">
+            {{#steps}}
+            <div class="erasight-step">
+                <div class="erasight-step-number">{{number}}</div>
+                <h4>{{title}}</h4>
+                <p>{{body}}</p>
+            </div>
+            {{/steps}}
+        </div>
+    </div>
+    {{/hashowitworks}}
+
     {{#hasvalueprops}}
     <div class="erasight-landing-section">
         <div class="erasight-valueprops">

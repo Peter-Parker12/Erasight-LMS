@@ -44,6 +44,19 @@
   }
 }
 
+// Bootstrap's reboot only sets $body-bg on the <body> element, never on
+// <html>. Most of the time that's invisible — but mobile Safari/Chrome
+// reveal <html>'s own background during elastic overscroll/rubber-band
+// bounce at the top (and some desktop trackpads trigger the same bounce),
+// and when <html> has no explicit background it defaults to white — a
+// white frame flashing around the dark page on scroll. Same root cause as
+// every other "background independent of $body-bg" bug found live this
+// session, just triggered by scroll physics instead of a hardcoded
+// component class.
+html {
+  background-color: var(--erasight-bg) !important;
+}
+
 h1, h2, .navbar-brand {
   font-family: var(--erasight-font-display);
 }
@@ -322,8 +335,42 @@ body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
 // depended on being a direct Boost child).
 .erasight-landing-section {
   max-width: 1100px;
-  margin: 0 auto 4rem;
+  margin: 0 auto 5.5rem;
   padding: 0 .5rem;
+}
+
+.erasight-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.erasight-step-number {
+  font-family: var(--erasight-font-mono);
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--erasight-ember);
+  border: 1px solid var(--erasight-mist);
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .9rem;
+}
+
+.erasight-step h4 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+.erasight-step p {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
 }
 
 .erasight-landing-section-alt {

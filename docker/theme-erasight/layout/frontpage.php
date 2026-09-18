@@ -331,6 +331,29 @@ $testimonials = [
     ],
 ];
 
+$steps = [
+    (object) [
+        'number' => 1,
+        'title' => get_string('step1_title', 'theme_erasight'),
+        'body' => get_string('step1_body', 'theme_erasight'),
+    ],
+    (object) [
+        'number' => 2,
+        'title' => get_string('step2_title', 'theme_erasight'),
+        'body' => get_string('step2_body', 'theme_erasight'),
+    ],
+    (object) [
+        'number' => 3,
+        'title' => get_string('step3_title', 'theme_erasight'),
+        'body' => get_string('step3_body', 'theme_erasight'),
+    ],
+    (object) [
+        'number' => 4,
+        'title' => get_string('step4_title', 'theme_erasight'),
+        'body' => get_string('step4_body', 'theme_erasight'),
+    ],
+];
+
 $valueprops = [
     (object) [
         'title' => get_string('valueprop1_title', 'theme_erasight'),
@@ -369,6 +392,9 @@ $teamsctaurl = !empty($CFG->supportemail)
     : (new moodle_url('/local/erasight/catalog.php'))->out(false);
 
 $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
+    'howitworkstitle' => get_string('howitworks_title', 'theme_erasight'),
+    'steps' => $steps,
+    'hashowitworks' => !empty($steps),
     'valueprops' => $valueprops,
     'hasvalueprops' => !empty($valueprops),
     'courses' => $landingcourses,

@@ -27,6 +27,28 @@ $string['colorscheme_desc'] = 'Applies site-wide — Home, Dashboard, My courses
 $string['colorscheme_light'] = 'Light';
 $string['colorscheme_dark'] = 'Dark';
 
+$string['footersettings'] = 'Footer';
+$string['social_linkedin'] = 'LinkedIn URL';
+$string['social_linkedin_desc'] = 'Leave blank until a real company LinkedIn page exists — the footer icon shows a placeholder link until then.';
+$string['social_twitter'] = 'X (Twitter) URL';
+$string['social_twitter_desc'] = 'Leave blank until a real account exists — the footer icon shows a placeholder link until then.';
+$string['social_facebook'] = 'Facebook URL';
+$string['social_facebook_desc'] = 'Leave blank until a real page exists — the footer icon shows a placeholder link until then.';
+
+// Sitewide footer, injected via before_standard_footer_html_generation —
+// see classes/hook_callbacks.php. Real internal links only (catalog,
+// login, support contact, Moodle's own built-in site policies page);
+// social links come from the settings above and fall back to "#" when
+// unset.
+$string['footer_tagline'] = 'Internal training, built for how the team actually learns.';
+$string['footer_links_heading'] = 'Site';
+$string['footer_link_catalog'] = 'Course catalog';
+$string['footer_link_login'] = 'Log in';
+$string['footer_link_contact'] = 'Contact';
+$string['footer_link_policies'] = 'Terms & privacy';
+$string['footer_social_heading'] = 'Follow';
+$string['footer_copyright'] = '© {$a} Erasight LMS';
+
 $string['landing_popular'] = 'Popular courses';
 $string['landing_viewall'] = 'View all courses';
 $string['landing_feedback'] = 'Student feedback';

@@ -777,3 +777,106 @@ body.pagelayout-frontpage #page.drawers .main-inner {
   justify-content: center;
   margin-bottom: 0;
 }
+
+// Sitewide footer band — injected on every page via
+// before_standard_footer_html_generation (classes/hook_callbacks.php),
+// not scoped to the front page. Self-contained colors via the theme's own
+// custom-property tokens rather than relying on whatever background
+// Boost Union's own #page-footer wrapper happens to have.
+.erasight-sitefooter {
+  background: var(--erasight-bg);
+  color: var(--erasight-ink);
+  border-top: 1px solid var(--erasight-mist);
+  padding: 2.5rem 1.5rem 1.5rem;
+}
+
+.erasight-sitefooter-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: space-between;
+}
+
+.erasight-sitefooter-brand {
+  flex: 1 1 240px;
+  max-width: 320px;
+}
+
+.erasight-sitefooter-name {
+  font-family: var(--erasight-font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: .5rem;
+}
+
+.erasight-sitefooter-brand p {
+  font-size: .85rem;
+  line-height: 1.6;
+  opacity: .8;
+}
+
+.erasight-sitefooter-heading {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  opacity: .65;
+  margin-bottom: .9rem;
+}
+
+.erasight-sitefooter-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.erasight-sitefooter-links li {
+  margin-bottom: .6rem;
+}
+
+.erasight-sitefooter-links a {
+  font-size: .87rem;
+  color: var(--erasight-ink);
+  text-decoration: none;
+  opacity: .85;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+}
+
+.erasight-sitefooter-icons {
+  display: flex;
+  gap: .75rem;
+}
+
+.erasight-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--erasight-mist);
+  border-radius: 999px;
+  color: var(--erasight-ink);
+  opacity: .8;
+  transition: opacity .15s ease, border-color .15s ease, color .15s ease;
+
+  &:hover {
+    opacity: 1;
+    border-color: var(--erasight-ember);
+    color: var(--erasight-ember);
+  }
+}
+
+.erasight-sitefooter-bottom {
+  max-width: 1100px;
+  margin: 2rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--erasight-mist);
+  font-size: .78rem;
+  opacity: .6;
+}

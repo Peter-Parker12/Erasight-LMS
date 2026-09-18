@@ -21,4 +21,37 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add($general);
+
+    // Social links are optional and empty by default — the footer still
+    // renders the icons with a "#" placeholder href when unset (real
+    // accounts don't exist yet), rather than ever hardcoding a fabricated
+    // profile URL. Fill these in via this settings page once real
+    // accounts exist, no code change needed.
+    $footer = new admin_settingpage('theme_erasight_footer', get_string('footersettings', 'theme_erasight'));
+
+    $footer->add(new admin_setting_configtext(
+        'theme_erasight/social_linkedin',
+        get_string('social_linkedin', 'theme_erasight'),
+        get_string('social_linkedin_desc', 'theme_erasight'),
+        '',
+        PARAM_URL
+    ));
+
+    $footer->add(new admin_setting_configtext(
+        'theme_erasight/social_twitter',
+        get_string('social_twitter', 'theme_erasight'),
+        get_string('social_twitter_desc', 'theme_erasight'),
+        '',
+        PARAM_URL
+    ));
+
+    $footer->add(new admin_setting_configtext(
+        'theme_erasight/social_facebook',
+        get_string('social_facebook', 'theme_erasight'),
+        get_string('social_facebook_desc', 'theme_erasight'),
+        '',
+        PARAM_URL
+    ));
+
+    $settings->add($footer);
 }

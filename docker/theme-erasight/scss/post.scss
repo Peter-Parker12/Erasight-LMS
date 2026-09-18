@@ -65,63 +65,107 @@ h1, h2, .navbar-brand {
 // follow $body-bg without any extra override — left unforced here
 // deliberately, and confirmed empirically against the live compiled CSS
 // after deploying this phase (see README) rather than assumed either way.
+// Every override in this block is !important. Started without it (plain
+// overrides, matching normal Sass/CSS practice), but two REAL, live
+// instances this rebuild — the login page's white panel, and the
+// dashboard's #page-header/.card welcome band — turned out to lose to
+// something else in the cascade despite compiling after Boost's own rules
+// (extra-scss is appended last, which normally would be enough). Rather
+// than keep chasing each one individually as it's found by screenshot,
+// every surface override here is forced, which is the more reliable
+// choice for "the whole logged-in/admin side should be dark, no
+// exceptions" than relying on source-order alone a third time.
 @if $erasight-dark {
   .bg-light {
     background-color: var(--erasight-surface) !important;
   }
 
   #page-header {
-    color: var(--erasight-ink);
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
   }
 
   .card {
-    background-color: var(--erasight-surface);
-    color: var(--erasight-ink);
-    border-color: var(--erasight-mist);
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
   }
 
   .dropdown-menu {
-    background-color: var(--erasight-surface);
-    border-color: var(--erasight-mist);
+    background-color: var(--erasight-surface) !important;
+    border-color: var(--erasight-mist) !important;
 
     .dropdown-item {
-      color: var(--erasight-ink);
+      color: var(--erasight-ink) !important;
 
       &:hover, &:focus {
-        background-color: var(--erasight-mist);
-        color: var(--erasight-ink);
+        background-color: var(--erasight-mist) !important;
+        color: var(--erasight-ink) !important;
       }
     }
   }
 
   .table {
-    color: var(--erasight-ink);
-    border-color: var(--erasight-mist);
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
 
     th, td {
-      border-color: var(--erasight-mist);
+      border-color: var(--erasight-mist) !important;
     }
   }
 
   .list-group-item {
-    background-color: var(--erasight-surface);
-    color: var(--erasight-ink);
-    border-color: var(--erasight-mist);
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
   }
 
   .form-control, .form-select, .form-check-input {
-    background-color: var(--erasight-surface);
-    color: var(--erasight-ink);
-    border-color: var(--erasight-mist);
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
   }
 
   .modal-content {
-    background-color: var(--erasight-surface);
-    color: var(--erasight-ink);
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
   }
 
   .breadcrumb-item, .breadcrumb-item a {
-    color: var(--erasight-ink);
+    color: var(--erasight-ink) !important;
+  }
+
+  // Dashboard/My courses welcome band and any other block-region card —
+  // confirmed live (not predicted) that #page-header's own real background
+  // comes from a .card it wraps on these pages, already covered by the
+  // .card rule above; this text-only rule is a second, more specific
+  // guarantee for the "Dashboard"/"Hi, {name}!" heading text itself.
+  #page-header h1, #page-header p, #page-header .h2 {
+    color: var(--erasight-ink) !important;
+  }
+
+  // Login page — found live, not predicted: theme/boost/scss/moodle/login.scss
+  // hardcodes ".pagelayout-login #page { background-color: $white; }",
+  // completely independent of $body-bg (same bug class as the old
+  // navbar-bg-white issue, just a different component). Without this,
+  // $body-color's light text sits on that hardcoded-white panel — light
+  // gray on white, nearly unreadable, exactly the failure mode this
+  // rebuild's "background and text decided together" rule exists to catch.
+  // .login-layout-left is left alone deliberately — it already uses
+  // $primary (our ember accent) as its own background, which needs no
+  // dark-mode change.
+  .pagelayout-login #page {
+    background-color: var(--erasight-bg) !important;
+  }
+
+  .login-layout-right-content, .loginform {
+    color: var(--erasight-ink) !important;
+  }
+
+  .login-container .login-form .form-control {
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
+    border-color: var(--erasight-mist) !important;
   }
 }
 

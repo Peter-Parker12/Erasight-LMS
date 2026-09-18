@@ -134,6 +134,7 @@
             {{/regions.outsideleft.hasblocks}}
 
         <div id="topofscroll" class="main-inner">
+            {{^hidenavbar}}
             <div class="drawer-toggles d-flex">
                 {{#courseindex}}
                     <div class="drawer-toggler drawer-left-toggle open-nav d-print-none">
@@ -170,6 +171,7 @@
                     </div>
                 {{/hasblocks}}
             </div>
+            {{/hidenavbar}}
             {{> theme_boost_union/javascriptdisabledhint }}
             {{> theme_boost_union/infobannersabove }}
             {{^hidenavbar}}{{{ output.full_header }}}{{/hidenavbar}}

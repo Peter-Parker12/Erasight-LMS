@@ -1,0 +1,137 @@
+{{!
+    @template theme_erasight/landing
+
+    The priced course grid + storefront sections inserted below the hero on
+    the front page (see layout/frontpage.php, templates/frontpage.mustache).
+    New, theme-owned markup — not a core override, and deliberately its own
+    small card markup here rather than reusing core_course/coursecard.mustache,
+    since that shared template also renders on the dashboard/catalog where a
+    price shouldn't appear for an already-enrolled student.
+
+    Context: courses (array of id/fullname/category/shortdescription/
+    courseimage/detailurl/price, where price is itself an object with a
+    "formatted" string, or absent) plus a separate hascourses boolean,
+    populartitle/viewalllabel/viewallurl. valueprops (array of title/body)
+    plus a separate hasvalueprops boolean. audienceindividualstitle/
+    audienceindividualsbody/audienceteamstitle/audienceteamsbody (a static
+    two-column block, not an array, so no guard boolean needed).
+    feedbacktitle, testimonials (array of quote/name/role/initials) plus a
+    separate hastestimonials boolean. scenariostitle, scenarios (array of
+    problem/outcome) plus a separate hasscenarios boolean.
+    teamstitle/teamsbody/teamscta/teamsctaurl. closingctatitle/
+    closingctaprimarylabel/closingctaprimaryurl/closingctasecondarylabel/
+    closingctasecondaryurl.
+
+    The has* booleans exist because Mustache sections have only one
+    behavior for an array: repeat the block once per element. Wrapping a
+    whole section (heading included) directly in a courses or testimonials
+    section tag is not an "if non-empty" guard — with 3 testimonials it
+    rendered that entire section, heading and all, 3 times on the live
+    site once already. The outer guard and the inner loop must use
+    different keys, never the same tag twice.
+
+    NOTE: never write two closing-brace characters next to each other
+    anywhere in this comment block, quoted or not — a Mustache comment
+    ends at the first such occurrence it scans past, not a matched one.
+    This exact mistake broke this theme's entire front page live, more
+    than once, in an earlier build — this comment stays prose for that
+    reason, permanently.
+}}
+<div class="erasight-landing">
+    {{#hasvalueprops}}
+    <div class="erasight-landing-section">
+        <div class="erasight-valueprops">
+            {{#valueprops}}
+            <div class="erasight-valueprop">
+                <h4>{{title}}</h4>
+                <p>{{body}}</p>
+            </div>
+            {{/valueprops}}
+        </div>
+    </div>
+    {{/hasvalueprops}}
+
+    {{#hascourses}}
+    <div class="erasight-landing-section">
+        <div class="erasight-landing-head">
+            <h3>{{populartitle}}</h3>
+            <a href="{{viewallurl}}">{{viewalllabel}}</a>
+        </div>
+        <div class="erasight-landing-grid">
+            {{#courses}}
+            <a class="erasight-landing-card" href="{{detailurl}}">
+                <div class="erasight-landing-thumb" style='background-image: url("{{{courseimage}}}");'></div>
+                <div class="erasight-landing-cardbody">
+                    {{#category}}<div class="erasight-landing-cat">{{category}}</div>{{/category}}
+                    <h4>{{fullname}}</h4>
+                    {{#shortdescription}}<p class="erasight-landing-desc">{{shortdescription}}</p>{{/shortdescription}}
+                    {{#price}}<div class="erasight-landing-price">{{formatted}}</div>{{/price}}
+                </div>
+            </a>
+            {{/courses}}
+        </div>
+    </div>
+    {{/hascourses}}
+
+    <div class="erasight-landing-section">
+        <div class="erasight-audience">
+            <div class="erasight-audience-col">
+                <h4>{{audienceindividualstitle}}</h4>
+                <p>{{audienceindividualsbody}}</p>
+            </div>
+            <div class="erasight-audience-col">
+                <h4>{{audienceteamstitle}}</h4>
+                <p>{{audienceteamsbody}}</p>
+            </div>
+        </div>
+    </div>
+
+    {{#hastestimonials}}
+    <div class="erasight-landing-section erasight-landing-section-alt">
+        <div class="erasight-landing-head"><h3>{{feedbacktitle}}</h3></div>
+        <div class="erasight-testimonial-grid">
+            {{#testimonials}}
+            <div class="erasight-tcard">
+                <blockquote>&ldquo;{{quote}}&rdquo;</blockquote>
+                <div class="erasight-tcard-who">
+                    <div class="erasight-tcard-avatar">{{initials}}</div>
+                    <div><strong>{{name}}</strong><span>{{role}}</span></div>
+                </div>
+            </div>
+            {{/testimonials}}
+        </div>
+    </div>
+    {{/hastestimonials}}
+
+    {{#hasscenarios}}
+    <div class="erasight-landing-section erasight-landing-section-alt">
+        <div class="erasight-landing-head"><h3>{{scenariostitle}}</h3></div>
+        <div class="erasight-scenario-grid">
+            {{#scenarios}}
+            <div class="erasight-scenario-card">
+                <div class="erasight-scenario-problem">{{problem}}</div>
+                <div class="erasight-scenario-outcome">{{outcome}}</div>
+            </div>
+            {{/scenarios}}
+        </div>
+    </div>
+    {{/hasscenarios}}
+
+    <div class="erasight-landing-section">
+        <div class="erasight-teams-band">
+            <div>
+                <h3>{{teamstitle}}</h3>
+                <p>{{teamsbody}}</p>
+                <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{teamsctaurl}}">{{teamscta}}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="erasight-landing-section erasight-closing-cta">
+        <h3>{{closingctatitle}}</h3>
+        <div class="erasight-hero-cta">
+            <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{closingctaprimaryurl}}">{{closingctaprimarylabel}}</a>
+            <a class="erasight-hero-btn erasight-hero-btn-secondary-alt" href="{{closingctasecondaryurl}}">{{closingctasecondarylabel}}</a>
+        </div>
+    </div>
+</div>

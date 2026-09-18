@@ -1,7 +1,7 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026091803;
+$plugin->version   = 2026091804;
 // Deployed/tested against MOODLE_502_STABLE (real base version confirmed:
 // 2026042003.01), but $plugin->requires stays at the 4.5 baseline since
 // this theme uses no 5.x-exclusive Moodle-core API (the SCSS callback

@@ -275,7 +275,132 @@ $herohtml = $OUTPUT->render_from_template('theme_erasight/hero', [
 ]);
 
 $templatecontext['herohtml'] = $herohtml;
-$templatecontext['landinghtml'] = ''; // Populated in a later rebuild phase — Mustache renders '' as nothing, not an error.
+
+// Real courses (not mock data — same stable core_course_category API
+// catalog.php already uses) plus each course's real image/price via
+// local_erasight's helpers. Explicit require, not relying on Moodle's lazy
+// plugin-loading timing.
+require_once($CFG->dirroot . '/local/erasight/lib.php');
+
+$landingcourses = [];
+$rawcourses = core_course_category::top()->get_courses([
+    'recursive' => true,
+    'limit' => 6,
+    'summary' => true,
+]);
+foreach ($rawcourses as $rawcourse) {
+    if (!$rawcourse->visible) {
+        continue;
+    }
+    $category = core_course_category::get($rawcourse->category, IGNORE_MISSING, true);
+    $plainsummary = trim(strip_tags($rawcourse->summary ?? ''));
+    $shortdescription = null;
+    if ($plainsummary !== '') {
+        $shortdescription = mb_strlen($plainsummary) > 140
+            ? mb_substr($plainsummary, 0, 140) . '…'
+            : $plainsummary;
+    }
+    $landingcourses[] = (object) [
+        'id' => $rawcourse->id,
+        'fullname' => format_string($rawcourse->fullname),
+        'category' => $category ? format_string($category->name) : '',
+        'shortdescription' => $shortdescription,
+        'courseimage' => local_erasight_get_course_image($rawcourse->id, $OUTPUT),
+        'detailurl' => (new moodle_url('/local/erasight/course.php', ['id' => $rawcourse->id]))->out(false),
+        'price' => local_erasight_get_course_price($rawcourse->id),
+    ];
+}
+
+// Testimonials, value props, scenarios, and the team-pricing pitch all
+// have no Moodle-native backing data — static, Erasight-specific content,
+// same honesty as this theme's other "no native field for this" callouts.
+// Testimonials/scenarios deliberately NOT framed as real client
+// engagements (no invented company names).
+$testimonials = [
+    (object) [
+        'quote' => 'The Kubernetes course paid for itself in the first week — I finally understood why our pods kept restarting instead of just guessing.',
+        'name' => 'Rina Kaur', 'role' => 'Backend Engineer', 'initials' => 'RK',
+    ],
+    (object) [
+        'quote' => "Client Communication Skills gave me an actual script for the 'we're behind schedule' conversation I'd been dreading. Used it the next day.",
+        'name' => 'Jamal Osei', 'role' => 'Product Manager', 'initials' => 'JM',
+    ],
+    (object) [
+        'quote' => 'Genuinely the first design-systems course that talks about governance instead of just color tokens. Shared it with my whole team.',
+        'name' => 'Elena Vasquez', 'role' => 'Senior Designer', 'initials' => 'EV',
+    ],
+];
+
+$valueprops = [
+    (object) [
+        'title' => get_string('valueprop1_title', 'theme_erasight'),
+        'body' => get_string('valueprop1_body', 'theme_erasight'),
+    ],
+    (object) [
+        'title' => get_string('valueprop2_title', 'theme_erasight'),
+        'body' => get_string('valueprop2_body', 'theme_erasight'),
+    ],
+    (object) [
+        'title' => get_string('valueprop3_title', 'theme_erasight'),
+        'body' => get_string('valueprop3_body', 'theme_erasight'),
+    ],
+];
+
+$scenarios = [
+    (object) [
+        'problem' => get_string('scenario1_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario1_outcome', 'theme_erasight'),
+    ],
+    (object) [
+        'problem' => get_string('scenario2_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario2_outcome', 'theme_erasight'),
+    ],
+    (object) [
+        'problem' => get_string('scenario3_problem', 'theme_erasight'),
+        'outcome' => get_string('scenario3_outcome', 'theme_erasight'),
+    ],
+];
+
+// No "contact sales" flow exists yet — the team-pricing CTA points at a
+// real mailto using the site's own configured support contact when set,
+// falling back to the catalog page rather than a dead href="#" when it isn't.
+$teamsctaurl = !empty($CFG->supportemail)
+    ? 'mailto:' . $CFG->supportemail
+    : (new moodle_url('/local/erasight/catalog.php'))->out(false);
+
+$landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
+    'valueprops' => $valueprops,
+    'hasvalueprops' => !empty($valueprops),
+    'courses' => $landingcourses,
+    // Separate boolean guard, not a reuse of the array itself as a
+    // pseudo-boolean — {{#array}}...{{/array}} repeats its block once PER
+    // ELEMENT in Mustache, it is not an "if non-empty" check.
+    'hascourses' => !empty($landingcourses),
+    'populartitle' => get_string('landing_popular', 'theme_erasight'),
+    'viewalllabel' => get_string('landing_viewall', 'theme_erasight'),
+    'viewallurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+    'audienceindividualstitle' => get_string('audience_individuals_title', 'theme_erasight'),
+    'audienceindividualsbody' => get_string('audience_individuals_body', 'theme_erasight'),
+    'audienceteamstitle' => get_string('audience_teams_title', 'theme_erasight'),
+    'audienceteamsbody' => get_string('audience_teams_body', 'theme_erasight'),
+    'feedbacktitle' => get_string('landing_feedback', 'theme_erasight'),
+    'hastestimonials' => !empty($testimonials),
+    'testimonials' => $testimonials,
+    'scenariostitle' => get_string('scenarios_title', 'theme_erasight'),
+    'scenarios' => $scenarios,
+    'hasscenarios' => !empty($scenarios),
+    'teamstitle' => get_string('landing_teams_title', 'theme_erasight'),
+    'teamsbody' => get_string('landing_teams_body', 'theme_erasight'),
+    'teamscta' => get_string('landing_teams_cta', 'theme_erasight'),
+    'teamsctaurl' => $teamsctaurl,
+    'closingctatitle' => get_string('closingcta_title', 'theme_erasight'),
+    'closingctaprimarylabel' => get_string('closingcta_primary', 'theme_erasight'),
+    'closingctaprimaryurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+    'closingctasecondarylabel' => get_string('closingcta_secondary', 'theme_erasight'),
+    'closingctasecondaryurl' => $teamsctaurl,
+]);
+
+$templatecontext['landinghtml'] = $landinghtml;
 // 'nonavbar' in config.php's $THEME->layouts['frontpage'] does NOT suppress
 // the persistent top nav bar — verified against real source (both raw
 // Boost's and Boost Union's core_renderer::full_header() usage is

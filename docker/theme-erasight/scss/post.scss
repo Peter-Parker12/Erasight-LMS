@@ -80,6 +80,18 @@ h1, h2, .navbar-brand {
     background-color: var(--erasight-surface) !important;
   }
 
+  // Found live on the Boost Union rebase, not predicted: raw Boost's own
+  // navbar dropped its literal "bg-white" class on 5.2 (now uses "bg-body",
+  // which already follows dark mode correctly) — but Boost Union's own
+  // #page-footer still hardcodes class="footer-popover bg-white" directly
+  // in its markup (confirmed live: a stray white bar below the hero on the
+  // front page, sitting right above an otherwise-empty dark page, was this
+  // exact element). Same fix, re-added for a different component this time.
+  .bg-white {
+    background-color: var(--erasight-surface) !important;
+    color: var(--erasight-ink) !important;
+  }
+
   #page-header {
     background-color: var(--erasight-surface) !important;
     color: var(--erasight-ink) !important;
@@ -303,4 +315,266 @@ h1, h2, .navbar-brand {
 // full-bleed, not the copy itself.
 body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
   max-width: none;
+}
+
+// Landing sections below the hero — towardsai.com-style editorial spacing
+// and card language, reused as-is from the pre-rebase build (none of this
+// depended on being a direct Boost child).
+.erasight-landing-section {
+  max-width: 1100px;
+  margin: 0 auto 4rem;
+  padding: 0 .5rem;
+}
+
+.erasight-landing-section-alt {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--erasight-mist);
+}
+
+.erasight-landing-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.erasight-landing-head h3 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.erasight-landing-head a {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--erasight-sky-deep);
+  text-decoration: none;
+}
+
+.erasight-valueprops {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.erasight-valueprop h4 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: .4rem;
+}
+
+.erasight-valueprop p {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
+}
+
+.erasight-landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
+  gap: 1rem;
+}
+
+.erasight-landing-card {
+  display: block;
+  text-decoration: none;
+  color: var(--erasight-ink);
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  background: var(--erasight-surface);
+  transition: transform .15s ease, box-shadow .15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -16px rgba(36, 23, 8, .25);
+    color: var(--erasight-ink);
+    text-decoration: none;
+  }
+}
+
+.erasight-landing-thumb {
+  height: 110px;
+  background-color: var(--erasight-mist);
+  background-size: cover;
+  background-position: center;
+}
+
+.erasight-landing-cardbody {
+  padding: .85rem 1rem 1rem;
+}
+
+.erasight-landing-cat {
+  display: inline-block;
+  font-size: .66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--erasight-sky-deep);
+  background: var(--erasight-sky-tint);
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  margin-bottom: .4rem;
+}
+
+.erasight-landing-cardbody h4 {
+  font-size: .92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: .4rem;
+}
+
+.erasight-landing-desc {
+  font-size: .8rem;
+  line-height: 1.5;
+  opacity: .8;
+  margin-bottom: .6rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.erasight-landing-price {
+  font-family: var(--erasight-font-mono);
+  font-weight: 700;
+  color: var(--erasight-ember);
+}
+
+.erasight-audience {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.erasight-audience-col {
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  padding: 1.5rem;
+}
+
+.erasight-audience-col h4 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: .5rem;
+}
+
+.erasight-audience-col p {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
+}
+
+.erasight-testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.erasight-tcard {
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  background: var(--erasight-surface);
+  padding: 1.1rem;
+}
+
+.erasight-tcard blockquote {
+  margin: 0 0 .9rem;
+  font-size: .87rem;
+  line-height: 1.6;
+}
+
+.erasight-tcard-who {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .78rem;
+}
+
+.erasight-tcard-who span {
+  display: block;
+  opacity: .8;
+}
+
+.erasight-tcard-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--erasight-umber);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--erasight-font-display);
+  font-weight: 700;
+  font-size: .72rem;
+  flex: none;
+}
+
+.erasight-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.erasight-scenario-card {
+  border: 1px solid var(--erasight-mist);
+  border-radius: $border-radius-lg;
+  padding: 1.1rem;
+  background: var(--erasight-surface);
+}
+
+.erasight-scenario-problem {
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--erasight-ember);
+  margin-bottom: .5rem;
+}
+
+.erasight-scenario-outcome {
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+.erasight-teams-band {
+  background: linear-gradient(120deg, var(--erasight-umber), #3a2a17);
+  color: #fff;
+  border-radius: $border-radius-lg;
+  padding: 2rem 2.2rem;
+}
+
+.erasight-teams-band h3 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: .5rem;
+}
+
+.erasight-teams-band p {
+  font-size: .87rem;
+  opacity: .92;
+  max-width: 48ch;
+  margin-bottom: 1.1rem;
+}
+
+.erasight-closing-cta {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid var(--erasight-mist);
+}
+
+.erasight-closing-cta h3 {
+  font-family: var(--erasight-font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+}
+
+.erasight-closing-cta .erasight-hero-cta {
+  justify-content: center;
+  margin-bottom: 0;
 }

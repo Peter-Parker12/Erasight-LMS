@@ -18,15 +18,23 @@ class hook_callbacks {
         );
     }
 
-    // Registered against core\hook\output\before_standard_footer_html_generation
-    // via db/hooks.php — verified against
-    // public/lib/classes/hook/output/before_standard_footer_html_generation.php
-    // on MOODLE_502_STABLE (replaces the deprecated standard_footer_html
-    // legacy callback). Renders a sitewide footer band on every page, not
-    // just the front page, since no layout other than frontpage.php is
-    // forked in this theme.
-    public static function before_standard_footer_html_generation(
-        \core\hook\output\before_standard_footer_html_generation $hook
+    // Registered against core\hook\output\after_standard_main_region_html_generation
+    // via db/hooks.php — deliberately NOT before_standard_footer_html_generation,
+    // which was tried first and confirmed live to render invisibly: Boost
+    // Union's own templates/theme_boost/footer.mustache wraps
+    // {{{ output.standard_footer_html }}} inside
+    // <div class="footer-content-popover">, a panel hidden by default and
+    // only shown when a visitor clicks the small "?" button — so that
+    // hook's HTML was real and present in the DOM (confirmed via curl) but
+    // never visible without that click. after_standard_main_region_html,
+    // by contrast, is called unconditionally in both Boost Union's raw
+    // drawers.mustache and this theme's own forked frontpage.mustache
+    // (verified against the real
+    // public/lib/classes/output/core_renderer.php::standard_after_main_region_html()
+    // dispatch on MOODLE_502_STABLE), right after the real <footer> element,
+    // with nothing collapsing it.
+    public static function after_standard_main_region_html_generation(
+        \core\hook\output\after_standard_main_region_html_generation $hook
     ): void {
         global $CFG;
 

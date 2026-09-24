@@ -1,159 +1,110 @@
 {{!
     @template theme_erasight/landing
 
-    The priced course grid + storefront sections inserted below the hero on
-    the front page (see layout/frontpage.php, templates/frontpage.mustache).
-    New, theme-owned markup — not a core override, and deliberately its own
-    small card markup here rather than reusing core_course/coursecard.mustache,
-    since that shared template also renders on the dashboard/catalog where a
-    price shouldn't appear for an already-enrolled student.
+    Front-page landing sections below the hero. Redesigned per Sep 2026 brief.
+    Sections in order:
+      S2 - Two course cards (AI Marketing + English)
+      S3 - How Erasight teaches (3 columns)
+      S5 - Instructors
+      S6 - FAQ accordion
+      S7 - Closing CTA band
 
-    Context: howitworkstitle, steps (array of number/title/bullets, where
-    bullets is itself an array of objects each holding one "text" string)
-    plus a separate hashowitworks boolean. courses (array of id/fullname/category/shortdescription/
-    courseimage/detailurl/price, where price is itself an object with a
-    "formatted" string, or absent) plus a separate hascourses boolean,
-    populartitle/viewalllabel/viewallurl. valueprops (array of title/body)
-    plus a separate hasvalueprops boolean. segments (array of title/badge/
-    bullets/cta/ctaurl — badge is null except on the enterprise segment)
-    plus a separate hassegments boolean.
-    feedbacktitle, testimonials (array of quote/name/role/initials) plus a
-    separate hastestimonials boolean. scenariostitle, scenarios (array of
-    problem/outcome) plus a separate hasscenarios boolean.
-    teamstitle/teamsbody/teamscta/teamsctaurl. closingctatitle/
-    closingctaprimarylabel/closingctaprimaryurl/closingctasecondarylabel/
-    closingctasecondaryurl.
+    Removed entirely: course grid (6 cards), testimonials, scenarios,
+    team pricing, segments — per brief instructions.
 
-    The has* booleans exist because Mustache sections have only one
-    behavior for an array: repeat the block once per element. Wrapping a
-    whole section (heading included) directly in a courses or testimonials
-    section tag is not an "if non-empty" guard — with 3 testimonials it
-    rendered that entire section, heading and all, 3 times on the live
-    site once already. The outer guard and the inner loop must use
-    different keys, never the same tag twice.
-
+    Context variables documented per section below.
     NOTE: never write two closing-brace characters next to each other
-    anywhere in this comment block, quoted or not — a Mustache comment
-    ends at the first such occurrence it scans past, not a matched one.
-    This exact mistake broke this theme's entire front page live, more
-    than once, in an earlier build — this comment stays prose for that
-    reason, permanently.
+    anywhere in this comment block — Mustache comment termination rule.
 }}
 <div class="erasight-landing">
-    {{#hashowitworks}}
-    <div class="erasight-landing-section">
-        <div class="erasight-landing-head"><h3>{{howitworkstitle}}</h3></div>
-        <div class="erasight-steps">
-            {{#steps}}
-            <div class="erasight-step">
-                <div class="erasight-step-number">{{number}}</div>
-                <h4>{{title}}</h4>
-                <ul class="erasight-checklist">
-                    {{#bullets}}<li>{{text}}</li>{{/bullets}}
-                </ul>
-            </div>
-            {{/steps}}
-        </div>
-    </div>
-    {{/hashowitworks}}
 
-    {{#hasvalueprops}}
-    <div class="erasight-landing-section">
-        <div class="erasight-valueprops">
-            {{#valueprops}}
-            <div class="erasight-valueprop">
-                <h4>{{title}}</h4>
-                <p class="erasight-checkline">{{body}}</p>
-            </div>
-            {{/valueprops}}
-        </div>
-    </div>
-    {{/hasvalueprops}}
-
+    {{! ── S2: Two Course Cards ───────────────────────────────── }}
     {{#hascourses}}
-    <div class="erasight-landing-section">
-        <div class="erasight-landing-head">
-            <h3>{{populartitle}}</h3>
-            <a href="{{viewallurl}}">{{viewalllabel}}</a>
-        </div>
-        <div class="erasight-landing-grid">
+    <section class="erasight-section" id="khoa-hoc">
+        <div class="erasight-courses-duo">
             {{#courses}}
-            <a class="erasight-landing-card" href="{{detailurl}}">
-                <div class="erasight-landing-thumb" style='background-image: url("{{{courseimage}}}");'></div>
-                <div class="erasight-landing-cardbody">
-                    {{#category}}<div class="erasight-landing-cat">{{category}}</div>{{/category}}
-                    <h4>{{fullname}}</h4>
-                    {{#shortdescription}}<p class="erasight-landing-desc">{{shortdescription}}</p>{{/shortdescription}}
-                    {{#price}}<div class="erasight-landing-price">{{formatted}}</div>{{/price}}
+            <div class="erasight-course-card">
+                <div class="erasight-course-img" style='background-image: url("{{{image}}}");'></div>
+                <div class="erasight-course-body">
+                    <span class="erasight-course-badge {{badgeclass}}">{{badge}}</span>
+                    <h3 class="erasight-course-name">{{name}}</h3>
+                    <p class="erasight-course-result">{{result}}</p>
+                    <ul class="erasight-course-bullets">
+                        {{#bullets}}
+                        <li>{{text}}</li>
+                        {{/bullets}}
+                    </ul>
+                    <div class="erasight-course-footer">
+                        <div class="erasight-course-price">{{price}}</div>
+                        {{#enrolldate}}
+                        <div class="erasight-course-date">{{enrolldate}}</div>
+                        {{/enrolldate}}
+                        <a class="erasight-btn erasight-btn-primary" href="{{detailurl}}">{{cta}}</a>
+                    </div>
                 </div>
-            </a>
+            </div>
             {{/courses}}
         </div>
-    </div>
+    </section>
     {{/hascourses}}
 
-    {{#hassegments}}
-    <div class="erasight-landing-section">
-        <div class="erasight-segments">
-            {{#segments}}
-            <div class="erasight-segment">
-                <h4>{{title}}{{#badge}}<span class="erasight-segment-badge">{{badge}}</span>{{/badge}}</h4>
-                <ul class="erasight-checklist">
-                    {{#bullets}}<li>{{text}}</li>{{/bullets}}
-                </ul>
-                <a class="erasight-segment-link" href="{{ctaurl}}">{{cta}} &rarr;</a>
-            </div>
-            {{/segments}}
-        </div>
-    </div>
-    {{/hassegments}}
-
-    {{#hastestimonials}}
-    <div class="erasight-landing-section erasight-landing-section-alt">
-        <div class="erasight-landing-head"><h3>{{feedbacktitle}}</h3></div>
-        <div class="erasight-testimonial-grid">
-            {{#testimonials}}
-            <div class="erasight-tcard">
-                <blockquote>&ldquo;{{quote}}&rdquo;</blockquote>
-                <div class="erasight-tcard-who">
-                    <div class="erasight-tcard-avatar">{{initials}}</div>
-                    <div><strong>{{name}}</strong><span>{{role}}</span></div>
+    {{! ── S3: How Erasight Teaches ───────────────────────────── }}
+    {{#hasmethods}}
+    <section class="erasight-section" id="cach-day">
+        <h2 class="erasight-section-title">{{methodtitle}}</h2>
+        <div class="erasight-methods">
+            {{#methods}}
+            <div class="erasight-method-card">
+                <div class="erasight-method-img" style='background-image: url("{{{image}}}");'>
+                    <span class="erasight-method-badge">{{step}}</span>
+                </div>
+                <div class="erasight-method-body">
+                    <h4>{{title}}</h4>
+                    <p>{{body}}</p>
                 </div>
             </div>
-            {{/testimonials}}
+            {{/methods}}
         </div>
-    </div>
-    {{/hastestimonials}}
+    </section>
+    {{/hasmethods}}
 
-    {{#hasscenarios}}
-    <div class="erasight-landing-section erasight-landing-section-alt">
-        <div class="erasight-landing-head"><h3>{{scenariostitle}}</h3></div>
-        <div class="erasight-scenario-grid">
-            {{#scenarios}}
-            <div class="erasight-scenario-card">
-                <div class="erasight-scenario-problem">{{problem}}</div>
-                <div class="erasight-scenario-outcome erasight-checkline">{{outcome}}</div>
+    {{! ── S5: Instructors ────────────────────────────────────── }}
+    {{#hasinstructors}}
+    <section class="erasight-section" id="giang-vien">
+        <h2 class="erasight-section-title">{{instructorstitle}}</h2>
+        <div class="erasight-instructors">
+            {{#instructors}}
+            <div class="erasight-instructor">
+                <img class="erasight-instructor-photo" src="{{{photo}}}" alt="{{name}}" width="120" height="120" loading="lazy">
+                <div class="erasight-instructor-info">
+                    <h4>{{name}}</h4>
+                    <span class="erasight-instructor-role">{{role}}</span>
+                    <p>{{bio}}</p>
+                </div>
             </div>
-            {{/scenarios}}
+            {{/instructors}}
         </div>
-    </div>
-    {{/hasscenarios}}
+    </section>
+    {{/hasinstructors}}
 
-    <div class="erasight-landing-section">
-        <div class="erasight-teams-band">
-            <div>
-                <h3>{{teamstitle}}</h3>
-                <p>{{teamsbody}}</p>
-                <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{teamsctaurl}}">{{teamscta}}</a>
-            </div>
+    {{! ── S6: FAQ Accordion ──────────────────────────────────── }}
+    {{#hasfaq}}
+    <section class="erasight-section" id="hoi-dap">
+        <h2 class="erasight-section-title">{{faqtitle}}</h2>
+        <div class="erasight-faq">
+            {{#faqs}}
+            <details class="erasight-faq-item" {{#first}}open{{/first}}>
+                <summary>{{question}}</summary>
+                <div class="erasight-faq-answer">{{answer}}</div>
+            </details>
+            {{/faqs}}
         </div>
-    </div>
+    </section>
+    {{/hasfaq}}
 
-    <div class="erasight-landing-section erasight-closing-cta">
-        <h3>{{closingctatitle}}</h3>
-        <div class="erasight-hero-cta">
-            <a class="erasight-hero-btn erasight-hero-btn-primary" href="{{closingctaprimaryurl}}">{{closingctaprimarylabel}}</a>
-            <a class="erasight-hero-btn erasight-hero-btn-secondary-alt" href="{{closingctasecondaryurl}}">{{closingctasecondarylabel}}</a>
-        </div>
-    </div>
+    {{! ── S7: Closing CTA Band ───────────────────────────────── }}
+    <section class="erasight-closing">
+        <p class="erasight-closing-text">{{closingheadline}}</p>
+        <a class="erasight-btn erasight-btn-primary erasight-btn-lg" href="{{closingctaurl}}">{{closingctalabel}}</a>
+    </section>
 </div>

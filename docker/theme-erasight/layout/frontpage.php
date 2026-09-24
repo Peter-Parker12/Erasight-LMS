@@ -227,266 +227,140 @@ if ($PAGE->pagelayout == 'frontpage') {
 require_once($CFG->dirroot . '/theme/boost_union/layout/includes/smartmenus.php');
 
 // --- Erasight addition starts here ---
-// $DB isn't in scope here the way it is in a normal top-level script: this
-// file is include()'d from inside a renderer method, so only the specific
-// globals that method itself declares — $CFG, $SITE, $OUTPUT, $PAGE, $USER
-// — are already available above without a `global` statement.
+// Redesigned per Sep 2026 brief. All fake data (testimonials, scenarios,
+// team pricing, segments, 6-card course grid) removed. Replaced with
+// real content: 2 courses, teaching methodology, instructors, FAQ.
 global $DB;
 
+// ── Hero (S1) ──────────────────────────────────────────────
 if (isloggedin() && !isguestuser()) {
-    $herocta = (object) [
-        'primaryurl' => (new moodle_url('/my/'))->out(false),
-        'primarylabel' => get_string('hero_primary_loggedin', 'theme_erasight'),
-        'secondaryurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
-        'secondarylabel' => get_string('hero_secondary_loggedin', 'theme_erasight'),
-    ];
+    $heroctaprimaryurl = (new moodle_url('/my/'))->out(false);
+    $heroctaprimarylabel = get_string('hero_primary_loggedin', 'theme_erasight');
+    $heroctasecondaryurl = (new moodle_url('/local/erasight/catalog.php'))->out(false);
+    $heroctasecondarylabel = get_string('hero_secondary_loggedin', 'theme_erasight');
 } else {
-    $herocta = (object) [
-        'primaryurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
-        'primarylabel' => get_string('hero_primary_loggedout', 'theme_erasight'),
-        'secondaryurl' => (new moodle_url('/login/index.php'))->out(false),
-        'secondarylabel' => get_string('hero_secondary_loggedout', 'theme_erasight'),
-    ];
+    $heroctaprimaryurl = '#khoa-hoc';
+    $heroctaprimarylabel = get_string('hero_cta_primary', 'theme_erasight');
+    $heroctasecondaryurl = (new moodle_url('/login/index.php'))->out(false);
+    $heroctasecondarylabel = get_string('hero_cta_secondary', 'theme_erasight');
 }
-
-$herostats = [
-    (object) [
-        'value' => $DB->count_records('course') - 1, // Excludes the site "front page" pseudo-course (id 1).
-        'label' => get_string('hero_stat_courses', 'theme_erasight'),
-    ],
-    (object) [
-        'value' => $DB->count_records_select(
-            'user',
-            'deleted = 0 AND confirmed = 1 AND id != ?',
-            [$CFG->siteguest]
-        ),
-        'label' => get_string('hero_stat_users', 'theme_erasight'),
-    ],
-];
 
 $herohtml = $OUTPUT->render_from_template('theme_erasight/hero', [
-    'eyebrow' => get_string('hero_eyebrow', 'theme_erasight'),
-    'headlinepre' => get_string('hero_headline_pre', 'theme_erasight'),
-    'headlineemphasis' => get_string('hero_headline_emphasis', 'theme_erasight'),
-    'headlinepost' => get_string('hero_headline_post', 'theme_erasight'),
+    'headline' => get_string('hero_headline', 'theme_erasight'),
     'tagline' => get_string('hero_tagline', 'theme_erasight'),
-    'cta' => $herocta,
-    'stats' => $herostats,
+    'ctaprimaryurl' => $heroctaprimaryurl,
+    'ctaprimarylabel' => $heroctaprimarylabel,
+    'ctasecondaryurl' => $heroctasecondaryurl,
+    'ctasecondarylabel' => $heroctasecondarylabel,
 ]);
-
 $templatecontext['herohtml'] = $herohtml;
 
-// Real courses (not mock data — same stable core_course_category API
-// catalog.php already uses) plus each course's real image/price via
-// local_erasight's helpers. Explicit require, not relying on Moodle's lazy
-// plugin-loading timing.
-require_once($CFG->dirroot . '/local/erasight/lib.php');
+// ── Course Cards (S2) — hardcoded per brief, 2 courses ────
+$courses = [
+    (object) [
+        'badge' => get_string('course_ai_badge', 'theme_erasight'),
+        'badgeclass' => 'erasight-badge-ai',
+        'name' => get_string('course_ai_name', 'theme_erasight'),
+        'result' => get_string('course_ai_result', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('course_ai_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('course_ai_bullet2', 'theme_erasight')],
+            (object) ['text' => get_string('course_ai_bullet3', 'theme_erasight')],
+        ],
+        'price' => get_string('course_ai_price', 'theme_erasight'),
+        'enrolldate' => get_string('course_enroll_date_placeholder', 'theme_erasight'),
+        'image' => (new moodle_url('/theme/erasight/pix/course-ai-marketing.jpg'))->out(false),
+        'detailurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+        'cta' => get_string('course_ai_cta', 'theme_erasight'),
+    ],
+    (object) [
+        'badge' => get_string('course_en_badge', 'theme_erasight'),
+        'badgeclass' => 'erasight-badge-en',
+        'name' => get_string('course_en_name', 'theme_erasight'),
+        'result' => get_string('course_en_result', 'theme_erasight'),
+        'bullets' => [
+            (object) ['text' => get_string('course_en_bullet1', 'theme_erasight')],
+            (object) ['text' => get_string('course_en_bullet2', 'theme_erasight')],
+            (object) ['text' => get_string('course_en_bullet3', 'theme_erasight')],
+        ],
+        'price' => get_string('course_en_price', 'theme_erasight'),
+        'enrolldate' => get_string('course_enroll_date_placeholder', 'theme_erasight'),
+        'image' => (new moodle_url('/theme/erasight/pix/course-english.jpg'))->out(false),
+        'detailurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
+        'cta' => get_string('course_en_cta', 'theme_erasight'),
+    ],
+];
 
-$landingcourses = [];
-$rawcourses = core_course_category::top()->get_courses([
-    'recursive' => true,
-    'limit' => 6,
-    'summary' => true,
-]);
-foreach ($rawcourses as $rawcourse) {
-    if (!$rawcourse->visible) {
-        continue;
-    }
-    $category = core_course_category::get($rawcourse->category, IGNORE_MISSING, true);
-    $plainsummary = trim(strip_tags($rawcourse->summary ?? ''));
-    $shortdescription = null;
-    if ($plainsummary !== '') {
-        $shortdescription = mb_strlen($plainsummary) > 140
-            ? mb_substr($plainsummary, 0, 140) . '…'
-            : $plainsummary;
-    }
-    $landingcourses[] = (object) [
-        'id' => $rawcourse->id,
-        'fullname' => format_string($rawcourse->fullname),
-        'category' => $category ? format_string($category->name) : '',
-        'shortdescription' => $shortdescription,
-        'courseimage' => local_erasight_get_course_image($rawcourse->id, $OUTPUT),
-        'detailurl' => (new moodle_url('/local/erasight/course.php', ['id' => $rawcourse->id]))->out(false),
-        'price' => local_erasight_get_course_price($rawcourse->id),
+// ── Teaching Methodology (S3) ──────────────────────────────
+$methods = [
+    (object) [
+        'step' => '01',
+        'title' => get_string('method1_title', 'theme_erasight'),
+        'body' => get_string('method1_body', 'theme_erasight'),
+        'image' => (new moodle_url('/theme/erasight/pix/method-live-class.jpg'))->out(false),
+    ],
+    (object) [
+        'step' => '02',
+        'title' => get_string('method2_title', 'theme_erasight'),
+        'body' => get_string('method2_body', 'theme_erasight'),
+        'image' => (new moodle_url('/theme/erasight/pix/method-real-product.jpg'))->out(false),
+    ],
+    (object) [
+        'step' => '03',
+        'title' => get_string('method3_title', 'theme_erasight'),
+        'body' => get_string('method3_body', 'theme_erasight'),
+        'image' => (new moodle_url('/theme/erasight/pix/method-mentorship.jpg'))->out(false),
+    ],
+];
+
+// ── Instructors (S5) ───────────────────────────────────────
+$instructors = [
+    (object) [
+        'name' => get_string('instructor_ai_name', 'theme_erasight'),
+        'role' => get_string('instructor_ai_role', 'theme_erasight'),
+        'bio' => get_string('instructor_ai_bio', 'theme_erasight'),
+        'photo' => (new moodle_url('/theme/erasight/pix/instructor-tien.jpg'))->out(false),
+    ],
+    (object) [
+        'name' => get_string('instructor_en_name', 'theme_erasight'),
+        'role' => get_string('instructor_en_role', 'theme_erasight'),
+        'bio' => get_string('instructor_en_bio', 'theme_erasight'),
+        'photo' => (new moodle_url('/theme/erasight/pix/instructor-quan.jpg'))->out(false),
+    ],
+];
+
+// ── FAQ (S6) ───────────────────────────────────────────────
+$faqs = [];
+for ($i = 1; $i <= 6; $i++) {
+    $faqs[] = (object) [
+        'question' => get_string("faq{$i}_q", 'theme_erasight'),
+        'answer' => get_string("faq{$i}_a", 'theme_erasight'),
+        'first' => ($i === 1),
     ];
 }
 
-// Testimonials, value props, scenarios, and the team-pricing pitch all
-// have no Moodle-native backing data — static, Erasight-specific content,
-// same honesty as this theme's other "no native field for this" callouts.
-// Testimonials/scenarios deliberately NOT framed as real client
-// engagements (no invented company names).
-$testimonials = [
-    (object) [
-        'quote' => 'The Kubernetes course paid for itself in the first week — I finally understood why our pods kept restarting instead of just guessing.',
-        'name' => 'Rina Kaur', 'role' => 'Backend Engineer', 'initials' => 'RK',
-    ],
-    (object) [
-        'quote' => "Client Communication Skills gave me an actual script for the 'we're behind schedule' conversation I'd been dreading. Used it the next day.",
-        'name' => 'Jamal Osei', 'role' => 'Product Manager', 'initials' => 'JM',
-    ],
-    (object) [
-        'quote' => 'Genuinely the first design-systems course that talks about governance instead of just color tokens. Shared it with my whole team.',
-        'name' => 'Elena Vasquez', 'role' => 'Senior Designer', 'initials' => 'EV',
-    ],
-];
-
-$steps = [
-    (object) [
-        'number' => 1,
-        'title' => get_string('step1_title', 'theme_erasight'),
-        'bullets' => [
-            (object) ['text' => get_string('step1_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('step1_bullet2', 'theme_erasight')],
-        ],
-    ],
-    (object) [
-        'number' => 2,
-        'title' => get_string('step2_title', 'theme_erasight'),
-        'bullets' => [
-            (object) ['text' => get_string('step2_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('step2_bullet2', 'theme_erasight')],
-        ],
-    ],
-    (object) [
-        'number' => 3,
-        'title' => get_string('step3_title', 'theme_erasight'),
-        'bullets' => [
-            (object) ['text' => get_string('step3_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('step3_bullet2', 'theme_erasight')],
-        ],
-    ],
-    (object) [
-        'number' => 4,
-        'title' => get_string('step4_title', 'theme_erasight'),
-        'bullets' => [
-            (object) ['text' => get_string('step4_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('step4_bullet2', 'theme_erasight')],
-        ],
-    ],
-];
-
-$valueprops = [
-    (object) [
-        'title' => get_string('valueprop1_title', 'theme_erasight'),
-        'body' => get_string('valueprop1_body', 'theme_erasight'),
-    ],
-    (object) [
-        'title' => get_string('valueprop2_title', 'theme_erasight'),
-        'body' => get_string('valueprop2_body', 'theme_erasight'),
-    ],
-    (object) [
-        'title' => get_string('valueprop3_title', 'theme_erasight'),
-        'body' => get_string('valueprop3_body', 'theme_erasight'),
-    ],
-];
-
-$scenarios = [
-    (object) [
-        'problem' => get_string('scenario1_problem', 'theme_erasight'),
-        'outcome' => get_string('scenario1_outcome', 'theme_erasight'),
-    ],
-    (object) [
-        'problem' => get_string('scenario2_problem', 'theme_erasight'),
-        'outcome' => get_string('scenario2_outcome', 'theme_erasight'),
-    ],
-    (object) [
-        'problem' => get_string('scenario3_problem', 'theme_erasight'),
-        'outcome' => get_string('scenario3_outcome', 'theme_erasight'),
-    ],
-];
-
-// No "contact sales" flow exists yet — the team-pricing CTA points at a
-// real mailto using the site's own configured support contact when set,
-// falling back to the catalog page rather than a dead href="#" when it isn't.
-$teamsctaurl = !empty($CFG->supportemail)
-    ? 'mailto:' . $CFG->supportemail
-    : (new moodle_url('/local/erasight/catalog.php'))->out(false);
-
-$catalogurl = (new moodle_url('/local/erasight/catalog.php'))->out(false);
-
-// Three real buyer segments, styled as heading + bullets + link cards
-// (towardsai.com's "three ways we help" pattern). Enterprise reuses the
-// same contact mechanism as the team CTA — there's no separate enterprise
-// sales flow yet, so this doesn't invent one.
-$segments = [
-    (object) [
-        'title' => get_string('audience_individuals_title', 'theme_erasight'),
-        'badge' => null,
-        'bullets' => [
-            (object) ['text' => get_string('audience_individuals_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('audience_individuals_bullet2', 'theme_erasight')],
-            (object) ['text' => get_string('audience_individuals_bullet3', 'theme_erasight')],
-        ],
-        'cta' => get_string('audience_individuals_cta', 'theme_erasight'),
-        'ctaurl' => $catalogurl,
-    ],
-    (object) [
-        'title' => get_string('audience_teams_title', 'theme_erasight'),
-        'badge' => null,
-        'bullets' => [
-            (object) ['text' => get_string('audience_teams_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('audience_teams_bullet2', 'theme_erasight')],
-            (object) ['text' => get_string('audience_teams_bullet3', 'theme_erasight')],
-        ],
-        'cta' => get_string('audience_teams_cta', 'theme_erasight'),
-        'ctaurl' => $teamsctaurl,
-    ],
-    (object) [
-        'title' => get_string('audience_enterprise_title', 'theme_erasight'),
-        'badge' => get_string('audience_enterprise_badge', 'theme_erasight'),
-        'bullets' => [
-            (object) ['text' => get_string('audience_enterprise_bullet1', 'theme_erasight')],
-            (object) ['text' => get_string('audience_enterprise_bullet2', 'theme_erasight')],
-            (object) ['text' => get_string('audience_enterprise_bullet3', 'theme_erasight')],
-        ],
-        'cta' => get_string('audience_enterprise_cta', 'theme_erasight'),
-        'ctaurl' => $teamsctaurl,
-    ],
-];
+// ── Closing CTA (S7) ──────────────────────────────────────
+$closingctaurl = (new moodle_url('/local/erasight/catalog.php'))->out(false);
 
 $landinghtml = $OUTPUT->render_from_template('theme_erasight/landing', [
-    'howitworkstitle' => get_string('howitworks_title', 'theme_erasight'),
-    'steps' => $steps,
-    'hashowitworks' => !empty($steps),
-    'valueprops' => $valueprops,
-    'hasvalueprops' => !empty($valueprops),
-    'courses' => $landingcourses,
-    // Separate boolean guard, not a reuse of the array itself as a
-    // pseudo-boolean — {{#array}}...{{/array}} repeats its block once PER
-    // ELEMENT in Mustache, it is not an "if non-empty" check.
-    'hascourses' => !empty($landingcourses),
-    'populartitle' => get_string('landing_popular', 'theme_erasight'),
-    'viewalllabel' => get_string('landing_viewall', 'theme_erasight'),
-    'viewallurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
-    'segments' => $segments,
-    'hassegments' => !empty($segments),
-    'feedbacktitle' => get_string('landing_feedback', 'theme_erasight'),
-    'hastestimonials' => !empty($testimonials),
-    'testimonials' => $testimonials,
-    'scenariostitle' => get_string('scenarios_title', 'theme_erasight'),
-    'scenarios' => $scenarios,
-    'hasscenarios' => !empty($scenarios),
-    'teamstitle' => get_string('landing_teams_title', 'theme_erasight'),
-    'teamsbody' => get_string('landing_teams_body', 'theme_erasight'),
-    'teamscta' => get_string('landing_teams_cta', 'theme_erasight'),
-    'teamsctaurl' => $teamsctaurl,
-    'closingctatitle' => get_string('closingcta_title', 'theme_erasight'),
-    'closingctaprimarylabel' => get_string('closingcta_primary', 'theme_erasight'),
-    'closingctaprimaryurl' => (new moodle_url('/local/erasight/catalog.php'))->out(false),
-    'closingctasecondarylabel' => get_string('closingcta_secondary', 'theme_erasight'),
-    'closingctasecondaryurl' => $teamsctaurl,
+    'courses' => $courses,
+    'hascourses' => !empty($courses),
+    'methodtitle' => get_string('method_title', 'theme_erasight'),
+    'methods' => $methods,
+    'hasmethods' => !empty($methods),
+    'instructorstitle' => get_string('instructors_title', 'theme_erasight'),
+    'instructors' => $instructors,
+    'hasinstructors' => !empty($instructors),
+    'faqtitle' => get_string('faq_title', 'theme_erasight'),
+    'faqs' => $faqs,
+    'hasfaq' => !empty($faqs),
+    'closingheadline' => get_string('closing_headline', 'theme_erasight'),
+    'closingctalabel' => get_string('closing_cta', 'theme_erasight'),
+    'closingctaurl' => $closingctaurl,
 ]);
 
 $templatecontext['landinghtml'] = $landinghtml;
-// 'nonavbar' in config.php's $THEME->layouts['frontpage'] does NOT suppress
-// the persistent top nav bar — verified against real source (both raw
-// Boost's and Boost Union's core_renderer::full_header() usage is
-// unchanged): it only sets $header->hasnavbar, a secondary in-page header
-// component. hidenavbar is this theme's own real flag, guarding both the
-// navbar partial AND output.full_header in templates/frontpage.mustache —
-// scoped to this layout only.
-$templatecontext['hidenavbar'] = true;
+$templatecontext['hidenavbar'] = false;
 // --- Erasight addition ends here ---
 
 // If we are on MWP.

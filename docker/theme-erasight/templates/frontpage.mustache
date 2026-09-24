@@ -123,6 +123,7 @@
                 {{{ regions.header.regionhtml }}}
             </section>
         {{/regions.header.hasblocks}}
+        {{{ herohtml }}}
 
         <div class="main-inner-wrapper {{{maininnerwrapperclass}}} {{{outsideregionsplacement}}}">
             {{#regions.outsideleft.hasblocks}}
@@ -173,14 +174,7 @@
             </div>
             {{/hidenavbar}}
             {{> theme_boost_union/javascriptdisabledhint }}
-            {{> theme_boost_union/infobannersabove }}
-            {{^hidenavbar}}{{{ output.full_header }}}{{/hidenavbar}}
             {{> theme_boost_union/infobannersbelow }}
-            {{#secondarymoremenu}}
-                <div class="secondary-navigation d-print-none">
-                    {{> core/moremenu}}
-                </div>
-            {{/secondarymoremenu}}
             {{{ output.course_content_header_notifications }}}
             {{#regions.contentupper.hasblocks}}
                 <section id="theme-block-region-content-upper" class="theme-block-region" aria-label="{{#str}}blocks{{/str}}">
@@ -221,7 +215,6 @@
                         {{#sliderpositionbeforeafter}}
                             {{> theme_boost_union/slider }}
                         {{/sliderpositionbeforeafter}}
-                        {{{ herohtml }}}
                         {{{ landinghtml }}}
                         {{{ output.main_content }}}
                         {{{ output.activity_navigation }}}
@@ -288,10 +281,10 @@
             </div>
         {{/regions.footer.hasblocks}}
 
+        {{{ output.standard_after_main_region_html }}}
         {{> theme_boost/footer }}
         {{> theme_boost_union/footnote }}
     </div>
-    {{{ output.standard_after_main_region_html }}}
 </div>
 
 </body>

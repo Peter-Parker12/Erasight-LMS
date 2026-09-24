@@ -1,43 +1,37 @@
 // Loaded BEFORE Bootstrap compiles (theme_boost_get_pre_scss) — these are
 // Sass variables, not CSS, so they reach every Bootstrap component Moodle's
-// admin screens are built from (buttons, forms, tables, alerts) automatically
-// — but only insofar as those components actually derive their color from
-// these specific variables at compile time. Confirmed on MOODLE_502_STABLE
-// this bundled Bootstrap has NO runtime CSS custom properties (--bs-body-bg
-// etc. do not exist in the compiled output) — Moodle 5.2 does ship a newer
-// "Moodle Design System" token layer (theme/boost/scss/design-system/) with
-// real --mds-* runtime custom properties, but checked directly against this
-// exact branch and confirmed it is NOT yet wired into any compiled component
-// CSS on 5.2 (the file that would define those custom properties,
-// lib/bundles/design-system/scss/tokens/_index_css_vars.scss, 404s here) —
-// that's scaffolding for a later Moodle release, not something to build on
-// yet. So: several components (notably the top nav bar, which
-// theme_boost/navbar.mustache hardcodes class="navbar-light bg-white"
-// directly in markup) will NOT follow $body-bg alone — see post.scss's
-// explicit per-component dark-mode overrides for those.
+// admin screens are built from (buttons, forms, tables, alerts) automatically.
+//
+// Color palette aligned with Erasight Edu Brand Guideline (Sep 2026):
+//   Teal (Primary accent) #0AAFA5
+//   Navy (Text/dark)      #1A3042
+//   Orange (CTA accent)   #E07820
+//   Light background      #F5F5F5
 //
 // $erasight-dark is set by lib.php's theme_erasight_get_pre_scss(), reading
-// the theme_erasight/colorscheme admin setting (settings.php) — this file
-// doesn't read the setting directly, it's prepended as a plain Sass boolean
-// before this file's own content runs.
-$primary: #E85D04;
+// the theme_erasight/colorscheme admin setting (settings.php).
+$primary: #E07820;
 
 @if $erasight-dark {
-  $body-bg:    #14181D;
+  $body-bg:    #0F1A24;
   $body-color: #D9DEE5;
-  $link-color: #1FAEDD;
+  $link-color: #0AAFA5;
 } @else {
-  $body-bg:    #FBF9F6;
-  $body-color: #241708;
-  $link-color: #0D7FA4;
+  $body-bg:    #F5F5F5;
+  $body-color: #1A3042;
+  $link-color: #0AAFA5;
 }
 
 $success: #1E8E5A;
-$warning: #B7791F;
+$warning: #E07820;
 $danger:  #C0392B;
 
-$border-radius:     .625rem;
-$border-radius-sm:  .5rem;
+// Brief spec: 8px buttons/inputs, 14px cards, 20px large blocks.
+$border-radius:     .5rem;
+$border-radius-sm:  .375rem;
 $border-radius-lg:  .875rem;
 
-$font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+// Be Vietnam Pro replaces Inter — Inter renders Vietnamese diacritical marks
+// (dấu ngã, dấu mũ chồng dấu thanh) poorly, clipping or overlapping them.
+// Be Vietnam Pro was designed specifically for Vietnamese text.
+$font-family-sans-serif: "Be Vietnam Pro", system-ui, sans-serif;

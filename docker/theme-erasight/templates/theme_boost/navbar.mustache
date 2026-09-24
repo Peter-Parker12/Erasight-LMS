@@ -1,0 +1,55 @@
+{{!
+    @template theme_erasight/theme_boost/navbar
+
+    Overrides theme_boost/navbar to display the official Erasight Edu logo with
+    high-contrast white navigation text, crisp alignment, and polished responsive layout.
+}}
+<nav class="navbar fixed-top navbar-expand erasight-top-navbar" aria-label="{{#str}}sitemenubar, admin{{/str}}">
+    <div class="container-fluid px-3 px-lg-4">
+        <button class="navbar-toggler aabtn d-block d-md-none px-2 my-1 border-0" data-toggler="drawers" data-action="toggle" data-target="theme_boost-drawers-primary">
+            <span class="navbar-toggler-icon"></span>
+            <span class="visually-hidden">{{#str}}sidepanel, core{{/str}}</span>
+        </button>
+
+        <a href="{{{ config.homeurl }}}" class="navbar-brand d-flex align-items-center m-0 me-4 p-0 aabtn" aria-label="Erasight Edu">
+            <img src="{{{ config.wwwroot }}}/theme/erasight/pix/erasight-logo-header.png" class="erasight-navbar-logo" alt="Erasight Edu" height="38" loading="eager">
+        </a>
+
+        {{#primarymoremenu}}
+            <div class="primary-navigation">
+                {{> core/moremenu}}
+            </div>
+        {{/primarymoremenu}}
+
+        {{# output.page_heading_menu}}
+            <ul class="navbar-nav d-none d-md-flex my-1 px-1">
+                {{{ output.page_heading_menu }}}
+            </ul>
+        {{/output.page_heading_menu}}
+
+        <div id="usernavigation" class="navbar-nav ms-auto h-100 align-items-center">
+            {{# output.search_box }}
+                <div class="erasight-search-wrap">
+                    {{{ output.search_box }}}
+                </div>
+                <div class="divider border-start h-50 align-self-center mx-2 opacity-25"></div>
+            {{/output.search_box}}
+            {{#langmenu}}
+                {{> theme_boost/language_menu }}
+                <div class="divider border-start h-50 align-self-center mx-2 opacity-25"></div>
+            {{/langmenu}}
+            {{{ output.edit_switch }}}
+            {{# output.navbar_plugin_output }}
+                {{{ . }}}
+                <div class="divider border-start h-50 align-self-center mx-2 opacity-25"></div>
+            {{/output.navbar_plugin_output}}
+            {{#usermenu}}
+                <div class="d-flex align-items-stretch usermenu-container" data-region="usermenu">
+                    {{> core/user_menu }}
+                </div>
+            {{/usermenu}}
+        </div>
+    </div>
+</nav>
+
+{{> theme_boost/primary-drawer-mobile }}

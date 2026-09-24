@@ -1,43 +1,61 @@
 {{!
     @template theme_erasight/sitefooter
 
-    Sitewide footer band, injected on every page via
-    before_standard_footer_html_generation (see
-    classes/hook_callbacks.php) rather than folded into
-    layout/frontpage.php, since that layout is only used on the front
-    page and every other page falls back to Boost Union's own unforked
-    drawers.php. New, theme-owned markup — not a core override.
+    Sitewide footer — 4-column layout per brief:
+    Column 1 (brand): Logo + tagline
+    Column 2: Khoá học links
+    Column 3: Về Erasight links
+    Column 4: Hỗ trợ links + social icons
+    Bottom: Legal info (company name, address, phone, email) + copyright
 
-    Context: tagline, linksheading, links (array of label/url).
-    socialheading, hassocial boolean, socials (array of name/url plus
-    one of iconlinkedin/icontwitter/iconfacebook set true, selecting
-    which inline SVG glyph to draw — Mustache has no string-equality
-    check, so this is precomputed in PHP rather than compared here).
-    copyright.
-
-    NOTE: never write two closing-brace characters next to each other
-    anywhere in this comment block, quoted or not, per this theme's
-    permanent house rule on comment self-termination.
+    Context: tagline, coursesheading, courseslinks, aboutheading, aboutlinks,
+    supportheading, supportlinks, socialheading, hassocial, socials,
+    legalname, legaladdress, legalphone, legalemail, copyright.
 }}
 <div class="erasight-sitefooter">
     <div class="erasight-sitefooter-inner">
         <div class="erasight-sitefooter-brand">
-            <div class="erasight-sitefooter-name">Erasight LMS</div>
-            <p>{{tagline}}</p>
+            <a href="{{{homeurl}}}" class="erasight-footer-brandlink" aria-label="Erasight Edu">
+                {{#logourl}}
+                <img src="{{{logourl}}}" alt="Erasight Edu" class="erasight-footer-logo" height="42">
+                {{/logourl}}
+                {{^logourl}}
+                <div class="erasight-sitefooter-name">Erasight Edu</div>
+                {{/logourl}}
+            </a>
+            <p class="erasight-footer-tagline">{{tagline}}</p>
+            <div class="erasight-sitefooter-artistic-pill">
+                <span class="erasight-art-dot"></span>
+                <span>Thực học &bull; Thực làm &bull; Thực nghiệp</span>
+            </div>
         </div>
 
-        <div class="erasight-sitefooter-links">
-            <div class="erasight-sitefooter-heading">{{linksheading}}</div>
+        <div class="erasight-sitefooter-col">
+            <div class="erasight-sitefooter-heading">{{coursesheading}}</div>
             <ul>
-                {{#links}}
+                {{#courseslinks}}
                 <li><a href="{{url}}">{{label}}</a></li>
-                {{/links}}
+                {{/courseslinks}}
             </ul>
         </div>
 
-        {{#hassocial}}
-        <div class="erasight-sitefooter-social">
-            <div class="erasight-sitefooter-heading">{{socialheading}}</div>
+        <div class="erasight-sitefooter-col">
+            <div class="erasight-sitefooter-heading">{{aboutheading}}</div>
+            <ul>
+                {{#aboutlinks}}
+                <li><a href="{{url}}">{{label}}</a></li>
+                {{/aboutlinks}}
+            </ul>
+        </div>
+
+        <div class="erasight-sitefooter-col">
+            <div class="erasight-sitefooter-heading">{{supportheading}}</div>
+            <ul>
+                {{#supportlinks}}
+                <li><a href="{{url}}">{{label}}</a></li>
+                {{/supportlinks}}
+            </ul>
+            {{#hassocial}}
             <div class="erasight-sitefooter-icons">
                 {{#socials}}
                 <a href="{{url}}" class="erasight-social-icon" aria-label="{{name}}" rel="noopener">
@@ -53,11 +71,17 @@
                 </a>
                 {{/socials}}
             </div>
+            {{/hassocial}}
         </div>
-        {{/hassocial}}
     </div>
 
-    <div class="erasight-sitefooter-bottom">
+    <div class="erasight-sitefooter-legal">
+        <div class="erasight-sitefooter-legalinfo">
+            <span>{{legalname}}</span>
+            <span>{{legaladdress}}</span>
+            <span>{{legalphone}}</span>
+            <span>{{legalemail}}</span>
+        </div>
         <span>{{copyright}}</span>
     </div>
 </div>

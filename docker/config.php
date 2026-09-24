@@ -42,7 +42,9 @@ $CFG->admin    = 'admin';
 // this container — without sslproxy, Moodle sees an HTTP request against an
 // https:// wwwroot, decides the scheme is wrong, and redirect-loops trying
 // to "fix" it (visible as endless 303s to / in the moodle service's logs).
-$CFG->sslproxy = true;
+if (strpos($CFG->wwwroot, 'https://') === 0) {
+    $CFG->sslproxy = true;
+}
 
 $CFG->directorypermissions = 0755;
 

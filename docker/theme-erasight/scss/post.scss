@@ -1,128 +1,1070 @@
-// Loaded AFTER Bootstrap compiles (theme_boost_get_extra_scss). $erasight-dark
-// is set by lib.php's theme_erasight_get_extra_scss(), reading the
-// theme_erasight/colorscheme admin setting (settings.php), prepended as a
-// plain Sass boolean before this file's own content runs — same mechanism
-// as pre.scss.
-//
-// Google Fonts load via a real <link> tag in <head>
-// (classes/hook_callbacks.php + db/hooks.php), never an SCSS @import — a
-// remote-URL @import compiles fine under dart-sass locally but silently
-// broke this exact theme's entire compiled CSS in production once already:
-// Moodle's bundled scssphp tries to resolve it as a local partial file,
-// throws, and that exception is swallowed inside
-// theme_config::get_css_content_from_scss()'s own try/catch with zero
-// visible error in production. Never reintroduce one here.
+// ═══════════════════════════════════════════════════════════
+// Erasight Edu — Post-Bootstrap SCSS
+// Loaded AFTER Bootstrap compiles. Aligned with Brand Guideline Sep 2026:
+//   Teal #0AAFA5 · Navy #1A3042 · Orange #E07820
+//   Body font: Be Vietnam Pro · Display: Bricolage Grotesque
+// ═══════════════════════════════════════════════════════════
+
+// ── 1. Design Tokens (CSS Custom Properties) ──────────────
 @if $erasight-dark {
   :root {
-    --erasight-sky: #1FAEDD;
-    --erasight-sky-deep: #1FAEDD; // brighter than the light-mode value — legible against a near-black page.
-    --erasight-sky-tint: rgba(31, 174, 221, .16);
-    --erasight-ember: #E85D04;
-    --erasight-ember-tint: rgba(232, 93, 4, .18);
-    --erasight-umber: #241708;
+    --erasight-teal: #0AAFA5;
+    --erasight-teal-deep: #0AAFA5;
+    --erasight-teal-tint: rgba(10, 175, 165, .16);
+    --erasight-ember: #E07820;
+    --erasight-ember-tint: rgba(224, 120, 32, .18);
+    --erasight-navy: #1A3042;
     --erasight-ink: #D9DEE5;
     --erasight-mist: #2A313B;
     --erasight-surface: #1B2028;
-    --erasight-bg: #14181D;
-    --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
+    --erasight-bg: #0F1A24;
+    --erasight-font-display: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
     --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
   }
 } @else {
   :root {
-    --erasight-sky: #1FAEDD;
-    --erasight-sky-deep: #0D7FA4;
-    --erasight-sky-tint: #E4F6FC;
-    --erasight-ember: #E85D04;
-    --erasight-ember-tint: #FDE7D6;
-    --erasight-umber: #241708;
-    --erasight-ink: #241708;
-    --erasight-mist: #F3EFE9;
+    --erasight-teal: #0AAFA5;
+    --erasight-teal-deep: #089A91;
+    --erasight-teal-tint: #E0F5F3;
+    --erasight-ember: #E07820;
+    --erasight-ember-tint: #FDEBD6;
+    --erasight-navy: #1A3042;
+    --erasight-ink: #1A3042;
+    --erasight-mist: #E7E1D8;
     --erasight-surface: #FFFFFF;
-    --erasight-bg: #FBF9F6;
-    --erasight-font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
+    --erasight-bg: #F5F5F5;
+    --erasight-font-display: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
     --erasight-font-mono: 'JetBrains Mono', ui-monospace, monospace;
   }
 }
 
-// Bootstrap's reboot only sets $body-bg on the <body> element, never on
-// <html>. Most of the time that's invisible — but mobile Safari/Chrome
-// reveal <html>'s own background during elastic overscroll/rubber-band
-// bounce at the top (and some desktop trackpads trigger the same bounce),
-// and when <html> has no explicit background it defaults to white — a
-// white frame flashing around the dark page on scroll. Same root cause as
-// every other "background independent of $body-bg" bug found live this
-// session, just triggered by scroll physics instead of a hardcoded
-// component class.
+// ── 2. Global Resets ──────────────────────────────────────
 html {
   background-color: var(--erasight-bg) !important;
 }
 
-h1, h2, .navbar-brand {
+h1, h2, h3, .navbar-brand {
   font-family: var(--erasight-font-display);
 }
 
-// Sitewide dark-mode surface coverage — done in the SAME pass the base
-// tokens above ship in, not retrofitted after screenshots show white boxes
-// (that's exactly what happened in the earlier build of this theme). This
-// closes the gap $body-bg/$body-color in pre.scss can't reach on its own:
-// several components get their color from Bootstrap's OWN compiled-in
-// variables ($white, $card-bg, etc.), not from $body-bg.
-//
-// NOTE on the top nav bar specifically: the OLDER 4.5-era build of this
-// theme force-overrode .bg-white/.navbar-light here, because
-// theme_boost/navbar.mustache hardcoded class="navbar-light bg-white" in
-// 4.5's markup. Re-verified fresh against the real MOODLE_502_STABLE
-// template for this rebuild — that markup changed: 5.2's navbar is now
-// class="navbar fixed-top bg-body navbar-expand", with no navbar-light/
-// bg-white at all. .bg-body is a real Bootstrap utility that should already
-// follow $body-bg without any extra override — left unforced here
-// deliberately, and confirmed empirically against the live compiled CSS
-// after deploying this phase (see README) rather than assumed either way.
-// Every override in this block is !important. Started without it (plain
-// overrides, matching normal Sass/CSS practice), but two REAL, live
-// instances this rebuild — the login page's white panel, and the
-// dashboard's #page-header/.card welcome band — turned out to lose to
-// something else in the cascade despite compiling after Boost's own rules
-// (extra-scss is appended last, which normally would be enough). Rather
-// than keep chasing each one individually as it's found by screenshot,
-// every surface override here is forced, which is the more reliable
-// choice for "the whole logged-in/admin side should be dark, no
-// exceptions" than relying on source-order alone a third time.
+// ── 3. Component Buttons ──────────────────────────────────
+.erasight-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .9rem;
+  padding: .65rem 1.4rem;
+  border-radius: .5rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+  min-height: 44px; // Accessibility: touch target ≥ 44px
+  min-width: 44px;
+
+  &:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--erasight-teal);
+    outline-offset: 2px;
+  }
+}
+
+.erasight-btn-primary {
+  background: var(--erasight-ember);
+  color: #fff;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(224, 120, 32, .35);
+    color: #fff;
+  }
+}
+
+.erasight-btn-secondary {
+  background: transparent;
+  border: 1.5px solid var(--erasight-mist);
+  color: var(--erasight-ink);
+
+  &:hover {
+    border-color: var(--erasight-teal);
+    color: var(--erasight-teal);
+  }
+}
+
+.erasight-btn-lg {
+  font-size: 1rem;
+  padding: .85rem 2rem;
+  border-radius: .5rem;
+}
+
+// ── 4. Hero Section ───────────────────────────────────────
+.erasight-hero {
+  background: linear-gradient(135deg, var(--erasight-navy) 0%, #0F2430 50%, var(--erasight-navy) 100%);
+  background-image: url('/theme/erasight/pix/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  position: relative;
+  color: #fff;
+  padding: 5.5rem 1.5rem 4.5rem;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 48, 66, .72);
+    z-index: 0;
+  }
+}
+
+.erasight-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.erasight-hero-title {
+  font-family: var(--erasight-font-display);
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.erasight-hero-tagline {
+  font-size: 1rem;
+  line-height: 1.7;
+  opacity: .92;
+  margin-bottom: 2rem;
+  max-width: 56ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.erasight-hero-cta {
+  display: flex;
+  justify-content: center;
+  margin-bottom: .75rem;
+}
+
+.erasight-hero-link {
+  display: inline-block;
+  font-size: .87rem;
+  color: rgba(255,255,255,.8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+// ── 5. Landing Sections ───────────────────────────────────
+.erasight-landing {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.erasight-section {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--erasight-mist);
+}
+
+.erasight-section-title {
+  font-family: var(--erasight-font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+// ── 5a. Course Cards (S2) ─────────────────────────────────
+.erasight-courses-duo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.erasight-course-card {
+  border: 1px solid var(--erasight-mist);
+  border-radius: .875rem;
+  overflow: hidden;
+  background: var(--erasight-surface);
+  transition: transform .2s ease, box-shadow .2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px -12px rgba(26, 48, 66, .18);
+  }
+}
+
+.erasight-course-img {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--erasight-mist);
+}
+
+.erasight-course-body {
+  padding: 1.25rem;
+}
+
+.erasight-course-badge {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  margin-bottom: .75rem;
+}
+
+.erasight-badge-ai {
+  color: var(--erasight-ember);
+  background: var(--erasight-ember-tint);
+}
+
+.erasight-badge-en {
+  color: var(--erasight-teal-deep);
+  background: var(--erasight-teal-tint);
+}
+
+.erasight-course-name {
+  font-family: var(--erasight-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: .5rem;
+  line-height: 1.3;
+}
+
+.erasight-course-result {
+  font-size: .88rem;
+  line-height: 1.6;
+  opacity: .85;
+  margin-bottom: .75rem;
+}
+
+.erasight-course-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+
+  li {
+    position: relative;
+    padding-left: 1.3rem;
+    font-size: .85rem;
+    line-height: 1.7;
+    margin-bottom: .35rem;
+
+    &::before {
+      content: '\2713';
+      position: absolute;
+      left: 0;
+      color: var(--erasight-teal);
+      font-weight: 700;
+    }
+  }
+}
+
+.erasight-course-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--erasight-mist);
+}
+
+.erasight-course-price {
+  font-family: var(--erasight-font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--erasight-ember);
+}
+
+.erasight-course-date {
+  font-size: .8rem;
+  opacity: .7;
+}
+
+.erasight-course-footer .erasight-btn {
+  margin-left: auto;
+}
+
+// ── 5b. Teaching Methodology (S3) ─────────────────────────
+.erasight-methods {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.erasight-method-card {
+  background: var(--erasight-surface);
+  border: 1px solid var(--erasight-mist);
+  border-radius: .875rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .14);
+    border-color: rgba(10, 175, 165, .5);
+  }
+}
+
+.erasight-method-img {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  background-color: var(--erasight-navy);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.45) 100%);
+  }
+}
+
+.erasight-method-badge {
+  position: absolute;
+  top: .85rem;
+  left: .85rem;
+  z-index: 1;
+  background: var(--erasight-teal);
+  color: #fff;
+  font-family: var(--erasight-font-mono);
+  font-weight: 700;
+  font-size: .8rem;
+  padding: .25rem .65rem;
+  border-radius: .35rem;
+  letter-spacing: .05em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+.erasight-method-body {
+  padding: 1.35rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  h4 {
+    font-family: var(--erasight-font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: .6rem;
+    color: var(--erasight-ink);
+    line-height: 1.35;
+  }
+
+  p {
+    font-size: .88rem;
+    line-height: 1.65;
+    opacity: .88;
+    margin: 0;
+  }
+}
+
+// ── 5c. Instructors (S5) ──────────────────────────────────
+.erasight-instructors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.erasight-instructor {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border: 1px solid var(--erasight-mist);
+  border-radius: .875rem;
+  background: var(--erasight-surface);
+}
+
+.erasight-instructor-photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.erasight-instructor-info {
+  h4 {
+    font-family: var(--erasight-font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: .15rem;
+  }
+
+  p {
+    font-size: .85rem;
+    line-height: 1.65;
+    opacity: .85;
+    margin-top: .5rem;
+  }
+}
+
+.erasight-instructor-role {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--erasight-teal);
+}
+
+// ── 5d. FAQ Accordion (S6) ────────────────────────────────
+.erasight-faq {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.erasight-faq-item {
+  border: 1px solid var(--erasight-mist);
+  border-radius: .5rem;
+  margin-bottom: .5rem;
+  overflow: hidden;
+  background: var(--erasight-surface);
+
+  &[open] summary {
+    border-bottom: 1px solid var(--erasight-mist);
+  }
+
+  summary {
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: .92rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: '+';
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--erasight-teal);
+      flex-shrink: 0;
+      margin-left: 1rem;
+      transition: transform .2s ease;
+    }
+  }
+
+  &[open] summary::after {
+    content: '\2212'; // minus sign
+    transform: rotate(0deg);
+  }
+}
+
+.erasight-faq-answer {
+  padding: 1rem 1.25rem 1.25rem;
+  font-size: .88rem;
+  line-height: 1.7;
+  opacity: .85;
+}
+
+// ── 5e. Closing CTA Band (S7) ─────────────────────────────
+.erasight-closing {
+  background: var(--erasight-navy);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  margin: 0 -1rem;
+  border-radius: 0;
+}
+
+.erasight-closing-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 48ch;
+  margin: 0 auto 1.5rem;
+  opacity: .92;
+}
+
+// ── 6. Artistic Footer ─────────────────────────────────────
+.erasight-sitefooter {
+  position: relative;
+  background: radial-gradient(circle at 15% 30%, rgba(10, 175, 165, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 85% 70%, rgba(224, 120, 32, 0.06) 0%, transparent 55%),
+              #0A131C !important;
+  color: #FFFFFF !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 4rem 1.5rem 2rem;
+  overflow: hidden;
+
+  // Luminous top glowing accent line
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #0AAFA5 30%, #E07820 70%, transparent 100%);
+    box-shadow: 0 0 16px rgba(10, 175, 165, 0.6);
+  }
+}
+
+.erasight-sitefooter-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.2fr;
+  gap: 2.5rem;
+
+  @media (max-width: 991px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.erasight-sitefooter-brand {
+  max-width: 320px;
+
+  .erasight-footer-brandlink {
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 0.85rem;
+
+    .erasight-footer-logo {
+      height: 42px;
+      max-height: 44px;
+      width: auto;
+      max-width: 220px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 10px rgba(10, 175, 165, 0.3));
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:hover {
+        transform: translateY(-2px) scale(1.02);
+        filter: drop-shadow(0 4px 14px rgba(10, 175, 165, 0.5));
+      }
+    }
+  }
+
+  .erasight-sitefooter-name {
+    font-family: var(--erasight-font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #FFFFFF;
+    margin-bottom: .5rem;
+  }
+
+  .erasight-footer-tagline, p {
+    color: #94A3B8 !important;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 0.85rem;
+  }
+
+  // Artistic Pill
+  .erasight-sitefooter-artistic-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(10, 175, 165, 0.1);
+    border: 1px solid rgba(10, 175, 165, 0.25);
+    color: #0AAFA5;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(10, 175, 165, 0.18);
+      border-color: rgba(10, 175, 165, 0.45);
+      color: #2DD4BF;
+      transform: translateY(-1px);
+    }
+
+    .erasight-art-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #0AAFA5;
+      box-shadow: 0 0 8px #0AAFA5;
+      animation: erasightPulse 2s infinite ease-in-out;
+    }
+  }
+}
+
+@keyframes erasightPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.erasight-sitefooter-heading {
+  font-family: var(--erasight-font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #FFFFFF !important;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 2px;
+    background: #0AAFA5;
+    border-radius: 2px;
+  }
+}
+
+.erasight-sitefooter-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: 0.65rem;
+
+    a {
+      font-size: 0.9rem;
+      color: #94A3B8 !important;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #0AAFA5 !important;
+        transform: translateX(5px);
+      }
+    }
+  }
+}
+
+.erasight-sitefooter-icons {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.erasight-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #CBD5E1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    background: rgba(10, 175, 165, 0.2);
+    border-color: #0AAFA5;
+    color: #FFFFFF;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(10, 175, 165, 0.35);
+  }
+}
+
+.erasight-sitefooter-legal {
+  max-width: 1200px;
+  margin: 2.5rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.82rem;
+  color: #64748B;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.erasight-sitefooter-legalinfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+
+  span {
+    color: #94A3B8 !important;
+  }
+}
+
+// ── 7. Top Navigation Bar (High-Contrast White Header) ─────
+.navbar.fixed-top,
+.erasight-top-navbar {
+  background-color: #0A141D !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  min-height: 60px;
+  padding: 0.4rem 1.5rem !important;
+
+  .navbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    margin-right: 1.75rem !important;
+    padding: 0 !important;
+
+    .erasight-navbar-logo, .logo {
+      height: 38px !important;
+      max-height: 38px !important;
+      width: auto !important;
+      max-width: 180px !important;
+      object-fit: contain !important;
+    }
+  }
+
+  // ALL links in the top navbar MUST be crisp white
+  .nav-link,
+  .navbar-nav .nav-link,
+  .btn,
+  .dropdown-toggle {
+    color: #FFFFFF !important;
+    font-weight: 500 !important;
+    font-size: 0.92rem !important;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: 0.375rem !important;
+    opacity: 0.95;
+    transition: all 0.15s ease;
+
+    &:hover, &:focus {
+      color: #0AAFA5 !important;
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      opacity: 1;
+    }
+
+    &.active, &[aria-current="page"] {
+      color: #0AAFA5 !important;
+      font-weight: 600 !important;
+      background-color: rgba(10, 175, 165, 0.14) !important;
+      opacity: 1;
+    }
+  }
+
+  // Icons (bell, chat, burger)
+  .icon, i, .fa, .navbar-toggler-icon {
+    color: #FFFFFF !important;
+  }
+
+  // Edit mode switch label
+  .custom-control-label,
+  .form-check-label,
+  span {
+    color: #FFFFFF !important;
+    font-size: 0.88rem !important;
+  }
+
+  // Search input in navbar
+  .erasight-search-wrap,
+  .simplesearchform {
+    input.form-control {
+      background-color: #142230 !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 999px !important;
+      padding: 0.35rem 0.85rem !important;
+      font-size: 0.85rem !important;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+    }
+  }
+}
+
+// ── 7b. Secondary Navigation Bar (Clean Tabs below Header) ──
+.secondary-navigation {
+  background-color: #111D2A !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+  padding: 0 !important;
+  margin: 0 0 2rem 0 !important;
+  width: 100% !important;
+
+  .navigation {
+    background: transparent !important;
+    border: none !important;
+    margin: 0 auto !important;
+    max-width: 1320px !important;
+    padding: 0 1rem !important;
+
+    .nav-tabs {
+      border: none !important;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      gap: 0.25rem !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-item {
+        margin: 0 !important;
+      }
+
+      // Crisp pure white tab text (fixes red-circled Settings tab)
+      .nav-link {
+        color: #FFFFFF !important;
+        font-weight: 500 !important;
+        font-size: 0.92rem !important;
+        padding: 0.85rem 1.25rem !important;
+        border: none !important;
+        border-bottom: 3px solid transparent !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        white-space: nowrap !important;
+        opacity: 0.9;
+        transition: all 0.15s ease !important;
+
+        &:hover, &:focus {
+          color: #0AAFA5 !important;
+          background-color: rgba(255, 255, 255, 0.05) !important;
+          border-bottom-color: rgba(10, 175, 165, 0.5) !important;
+          opacity: 1;
+        }
+
+        &.active, &[aria-selected="true"], &[aria-current="page"] {
+          color: #FFFFFF !important;
+          font-weight: 700 !important;
+          background: transparent !important;
+          border-bottom: 3px solid #0AAFA5 !important;
+          opacity: 1;
+        }
+      }
+
+      .dropdown-toggle {
+        color: #FFFFFF !important;
+      }
+    }
+  }
+}
+
+// ── 7c. Activity Pages & Content Boxes (Assignments, Quizzes, Resources, etc.) ──
+.path-mod {
+  .activity-header {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+
+  .activity-details:not(:empty),
+  .activity-information,
+  .activity-description,
+  [data-region="activity-details"],
+  [data-region="activity-information"],
+  .generalbox,
+  .boxaligncenter,
+  #intro {
+    background-color: #121F2D !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 14px !important;
+    padding: 1.25rem 1.5rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1.75rem !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+
+    p, span, div, strong, small {
+      color: #FFFFFF !important;
+      font-size: 1rem !important;
+      line-height: 1.6 !important;
+    }
+
+    .no-overflow {
+      color: #FFFFFF !important;
+    }
+  }
+
+  .activity-dates {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-top: 0.75rem !important;
+    margin-top: 0.75rem !important;
+
+    .date-item {
+      color: #94A3B8 !important;
+
+      .date-item-label {
+        color: #CBD5E1 !important;
+        font-weight: 600 !important;
+      }
+    }
+  }
+
+  .completion-info {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-top: 0.75rem !important;
+    margin-top: 0.75rem !important;
+    color: #CBD5E1 !important;
+
+    .automatic-completion-title {
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+    }
+  }
+}
+
+.generalbox,
+.box.py-3 {
+  background-color: #121F2D !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+
+  p, span, div {
+    color: #FFFFFF !important;
+  }
+}
+
+// ── 7d. Layout Spacing & Page Clearing ─────────────────────
+#page.drawers {
+  margin-top: 0 !important;
+  padding-top: 60px !important;
+}
+
+body.pagelayout-frontpage {
+  // Hide yellow box completely: no site header, no secondary nav tabs on frontpage
+  #page-header,
+  header#page-header,
+  .secondary-navigation,
+  .page-header-headings,
+  .header-maxwidth {
+    display: none !important;
+  }
+
+  // Remove side paddings from page wrapper so hero banner spans 100% full-width edge-to-edge
+  #page.drawers {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 60px !important;
+  }
+
+  .main-inner-wrapper {
+    margin-top: 0 !important;
+  }
+
+  &.limitedwidth #page.drawers .main-inner,
+  #page.drawers .main-inner {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    max-width: none !important;
+  }
+
+  // Red box: 100% full-width edge-to-edge hero banner
+  .erasight-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 6.5rem 2rem 5.5rem !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+// ── 8. Dark Mode Component Overrides ──────────────────────
 @if $erasight-dark {
   .bg-light {
     background-color: var(--erasight-surface) !important;
   }
 
-  // Found live on the Boost Union rebase, not predicted: raw Boost's own
-  // navbar dropped its literal "bg-white" class on 5.2 (now uses "bg-body",
-  // which already follows dark mode correctly) — but Boost Union's own
-  // #page-footer still hardcodes class="footer-popover bg-white" directly
-  // in its markup (confirmed live: a stray white bar below the hero on the
-  // front page, sitting right above an otherwise-empty dark page, was this
-  // exact element). Same fix, re-added for a different component this time.
   .bg-white {
     background-color: var(--erasight-surface) !important;
     color: var(--erasight-ink) !important;
   }
 
-  // Boost Union's own compiled CSS hardcodes "#page.drawers .main-inner"
-  // to "background-color:#fff" directly — confirmed live by fetching the
-  // deployed stylesheet, not guessed. .main-inner wraps EVERY page's
-  // content, so this single hardcoded white was the real source of two
-  // separate-looking symptoms: thin white slivers flanking the front
-  // page content (its own small .5rem side padding showing the white
-  // through), and a white strip above the dashboard's header card (its
-  // rounded top corners + margin showing through). Same bug class as
-  // .bg-white/#page-header/.card above, just not discovered until now
-  // because it only shows at the few px this container isn't fully
-  // covered by something else's own background.
   #page.drawers .main-inner {
     background-color: var(--erasight-bg) !important;
   }
 
   #page-header {
-    background-color: var(--erasight-surface) !important;
-    color: var(--erasight-ink) !important;
+    background-color: #0F1A24 !important;
+    color: #FFFFFF !important;
+    padding: 1.5rem 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+    h1, h2, h3, .page-header-headings, .h1, .h2, .h3 {
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+    }
+
+    .breadcrumb {
+      .breadcrumb-item, .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.7) !important;
+        &:hover { color: #0AAFA5 !important; }
+      }
+      .breadcrumb-item.active {
+        color: #FFFFFF !important;
+      }
+    }
+  }
+
+  .form-label, label, .col-form-label, legend {
+    color: #F1F5F9 !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+  }
+
+  .form-control, .form-select, select.form-control, textarea.form-control {
+    background-color: #162432 !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.55rem 0.85rem !important;
+
+    &:focus {
+      background-color: #1B2B3B !important;
+      color: #FFFFFF !important;
+      border-color: #0AAFA5 !important;
+      box-shadow: 0 0 0 3px rgba(10, 175, 165, 0.25) !important;
+    }
+  }
+
+  .form-text, .text-muted, small.text-muted {
+    color: #94A3B8 !important;
+  }
+
+  .form-group.row {
+    margin-bottom: 1.25rem !important;
   }
 
   .card {
@@ -132,35 +1074,24 @@ h1, h2, .navbar-brand {
   }
 
   .dropdown-menu {
-    background-color: var(--erasight-surface) !important;
-    border-color: var(--erasight-mist) !important;
+    background-color: #162432 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
 
     .dropdown-item {
-      color: var(--erasight-ink) !important;
-
+      color: #FFFFFF !important;
       &:hover, &:focus {
-        background-color: var(--erasight-mist) !important;
-        color: var(--erasight-ink) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #0AAFA5 !important;
       }
     }
   }
 
   .table {
     color: var(--erasight-ink) !important;
-    border-color: var(--erasight-mist) !important;
-
-    th, td {
-      border-color: var(--erasight-mist) !important;
-    }
+    th, td { border-color: var(--erasight-mist) !important; }
   }
 
   .list-group-item {
-    background-color: var(--erasight-surface) !important;
-    color: var(--erasight-ink) !important;
-    border-color: var(--erasight-mist) !important;
-  }
-
-  .form-control, .form-select, .form-check-input {
     background-color: var(--erasight-surface) !important;
     color: var(--erasight-ink) !important;
     border-color: var(--erasight-mist) !important;
@@ -171,89 +1102,16 @@ h1, h2, .navbar-brand {
     color: var(--erasight-ink) !important;
   }
 
-  .breadcrumb-item, .breadcrumb-item a {
-    color: var(--erasight-ink) !important;
-  }
-
-  // Site administration's tab bar (.nav-tabs, e.g. General/Users/Courses/…)
-  // — found live: its border-bottom is Bootstrap's own $border-color, a
-  // light gray that reads as a stray white line under the tabs on a dark
-  // page. Same fix as everywhere else: pin it to the dark-mode border token.
-  .nav-tabs {
-    border-bottom-color: var(--erasight-mist) !important;
-
-    .nav-link {
-      color: var(--erasight-ink) !important;
-      border-color: transparent !important;
-
-      &.active {
-        background-color: transparent !important;
-        border-color: var(--erasight-mist) var(--erasight-mist) var(--erasight-bg) !important;
-      }
-
-      &:hover {
-        border-color: var(--erasight-mist) !important;
-      }
-    }
-  }
-
-  // Bootstrap 5.3's alert/subtle-background colors are pale tints meant
-  // for a white page, and only flip to a dark-appropriate shade via its
-  // OWN native color-mode attribute ([data-bs-theme="dark"] on the html
-  // root) — which Erasight's dark mode never sets, since it's a separate
-  // SCSS-variable-driven toggle, not Bootstrap's built-in one. Left
-  // unpatched, this is exactly the same "background independent of
-  // $body-bg" bug class as everything else in this block, just coming
-  // from Bootstrap's own color-mode system instead of a hardcoded class.
-  // Found live: a pale pink alert box on Site administration > Users.
   .alert {
     color: var(--erasight-ink) !important;
     border-color: var(--erasight-mist) !important;
   }
 
-  .alert-success, .bg-success-subtle {
-    background-color: rgba(25, 135, 84, .18) !important;
-  }
+  .alert-success, .bg-success-subtle { background-color: rgba(25,135,84,.18) !important; }
+  .alert-danger, .bg-danger-subtle { background-color: rgba(220,53,69,.18) !important; }
+  .alert-warning, .bg-warning-subtle { background-color: rgba(224,120,32,.16) !important; }
+  .alert-info, .bg-info-subtle { background-color: rgba(10,175,165,.16) !important; }
 
-  .alert-danger, .bg-danger-subtle {
-    background-color: rgba(220, 53, 69, .18) !important;
-  }
-
-  .alert-warning, .bg-warning-subtle {
-    background-color: rgba(255, 193, 7, .16) !important;
-  }
-
-  .alert-info, .bg-info-subtle {
-    background-color: rgba(13, 202, 240, .16) !important;
-  }
-
-  .bg-primary-subtle {
-    background-color: var(--erasight-ember-tint) !important;
-  }
-
-  .bg-secondary-subtle {
-    background-color: var(--erasight-mist) !important;
-  }
-
-  // Dashboard/My courses welcome band and any other block-region card —
-  // confirmed live (not predicted) that #page-header's own real background
-  // comes from a .card it wraps on these pages, already covered by the
-  // .card rule above; this text-only rule is a second, more specific
-  // guarantee for the "Dashboard"/"Hi, {name}!" heading text itself.
-  #page-header h1, #page-header p, #page-header .h2 {
-    color: var(--erasight-ink) !important;
-  }
-
-  // Login page — found live, not predicted: theme/boost/scss/moodle/login.scss
-  // hardcodes ".pagelayout-login #page { background-color: $white; }",
-  // completely independent of $body-bg (same bug class as the old
-  // navbar-bg-white issue, just a different component). Without this,
-  // $body-color's light text sits on that hardcoded-white panel — light
-  // gray on white, nearly unreadable, exactly the failure mode this
-  // rebuild's "background and text decided together" rule exists to catch.
-  // .login-layout-left is left alone deliberately — it already uses
-  // $primary (our ember accent) as its own background, which needs no
-  // dark-mode change.
   .pagelayout-login #page {
     background-color: var(--erasight-bg) !important;
   }
@@ -267,616 +1125,694 @@ h1, h2, .navbar-brand {
     color: var(--erasight-ink) !important;
     border-color: var(--erasight-mist) !important;
   }
+// ── 8b. Drawer & Course Index Sidebar (Matching Screenshot 1) ──
+.drawer,
+[data-region="drawer"],
+.drawercontent,
+#theme_boost-drawers-courseindex,
+#theme_boost-drawers-blocks,
+.drawer-left,
+.drawer-right {
+  background-color: #0D1722 !important;
+  color: #FFFFFF !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35) !important;
 }
 
-// Front-page hero. towardsai.com-style left-aligned, emphasized-word
-// headline. Every text element's color/opacity is picked for contrast
-// against BOTH ends of the gradient below (a saturated blue at the
-// top-left origin, near-black at 70%), decided here alongside the
-// background rather than audited for readability as a later pass.
-.erasight-hero {
-  background: radial-gradient(120% 160% at 15% 0%, var(--erasight-sky-deep), var(--erasight-umber) 70%);
-  color: #fff;
-  padding: 4rem 1.5rem;
-  margin: -1.5rem -1.5rem 1.5rem;
-}
+.drawerheader {
+  background-color: #0A131C !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 0.75rem 1rem !important;
 
-.erasight-hero-inner {
-  max-width: 720px;
-  margin: 0;
-  text-align: left;
-}
+  #courseindexdrawerheading,
+  h5, a, span, .drawertitle {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    font-family: var(--erasight-font-display) !important;
+  }
 
-.erasight-hero-eyebrow {
-  font-size: .78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  opacity: .75;
-  margin-bottom: .9rem;
-}
-
-.erasight-hero-title {
-  font-family: var(--erasight-font-display);
-  font-size: clamp(1.9rem, 4vw, 2.75rem);
-  font-weight: 800;
-  margin-bottom: .75rem;
-}
-
-.erasight-emphasis {
-  // Ember, not sky — the headline sits near the gradient's blue end (its
-  // origin is the same top-left corner as this left-aligned text), so a
-  // warm accent reads with far stronger contrast there than another blue
-  // would. Same accent already used for CTAs/prices elsewhere.
-  font-style: italic;
-  color: var(--erasight-ember);
-}
-
-.erasight-hero-tagline {
-  font-size: 1.05rem;
-  // .95, not a lower opacity — this sits directly on the gradient, where
-  // reduced-opacity white was noticeably harder to read on the lighter
-  // (blue) half than the darker half.
-  opacity: .95;
-  margin-bottom: 1.75rem;
-}
-
-.erasight-hero-cta {
-  display: flex;
-  justify-content: flex-start;
-  gap: .75rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-.erasight-hero-btn {
-  display: inline-flex;
-  align-items: center;
-  font-weight: 700;
-  font-size: .9rem;
-  padding: .7rem 1.4rem;
-  border-radius: $border-radius-lg;
-  text-decoration: none;
-  transition: transform .15s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    text-decoration: none;
+  .btn, button, .icon {
+    color: #FFFFFF !important;
+    opacity: 0.9;
+    &:hover {
+      color: #0AAFA5 !important;
+      opacity: 1;
+    }
   }
 }
 
-.erasight-hero-btn-primary {
-  background: var(--erasight-ember);
-  color: #fff;
-}
+// Drawer Toggles & Icon Buttons
+.drawer-toggles,
+.drawer-toggler {
+  .btn, button, .btn-icon {
+    background-color: #142230 !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 
-.erasight-hero-btn-secondary {
-  background: rgba(255, 255, 255, .12);
-  border: 1px solid rgba(255, 255, 255, .35);
-  color: #fff;
-}
-
-// A second "secondary" style for bands that sit on the page's normal
-// surface color, not the hero's dark gradient — the white-on-transparent
-// treatment above would be invisible there.
-.erasight-hero-btn-secondary-alt {
-  background: transparent;
-  border: 1px solid var(--erasight-mist);
-  color: var(--erasight-ink);
-}
-
-.erasight-hero-stats {
-  display: flex;
-  justify-content: flex-start;
-  gap: 2.5rem;
-}
-
-.erasight-hero-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.erasight-hero-stat-value {
-  font-family: var(--erasight-font-mono);
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-
-.erasight-hero-stat-label {
-  font-size: .72rem;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  opacity: .88;
-}
-
-// Moodle's own core /index.php unconditionally adds a 'limitedwidth' body
-// class for the site front page (confirmed in real index.php on
-// MOODLE_502_STABLE — not a theme or layout concern, so nothing in
-// config.php can fix it), which Boost's own layout.scss uses to cap
-// #page.drawers .main-inner to a narrow readable width. Overridden here,
-// scoped to .pagelayout-frontpage only, so every other limitedwidth page
-// (course index, user preferences, etc.) keeps its normal readable width
-// cap — only this storefront-style landing page goes edge-to-edge. The
-// hero above has its own internal max-width (720px) for readable text, so
-// removing this outer constraint lets only the background gradient go
-// full-bleed, not the copy itself.
-body.pagelayout-frontpage.limitedwidth #page.drawers .main-inner {
-  max-width: none;
-}
-
-// Boost Union's own .main-inner carries a top margin+padding meant to
-// separate content from the persistent navbar above it — dead space on
-// this layout, since hidenavbar removes that navbar entirely. Zeroed
-// here so the hero starts flush with the viewport top instead of behind
-// an empty gap.
-body.pagelayout-frontpage #page.drawers .main-inner {
-  margin-top: 0;
-  padding-top: 0;
-}
-
-// Landing sections below the hero — towardsai.com-style editorial spacing
-// and card language, reused as-is from the pre-rebase build (none of this
-// depended on being a direct Boost child).
-.erasight-landing-section {
-  max-width: 1100px;
-  margin: 0 auto 5.5rem;
-  padding: 0 .5rem;
-}
-
-.erasight-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
-}
-
-.erasight-step-number {
-  font-family: var(--erasight-font-mono);
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--erasight-ember);
-  border: 1px solid var(--erasight-mist);
-  border-radius: 999px;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: .9rem;
-}
-
-.erasight-step h4 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: .4rem;
-}
-
-// Shared checkmark language — used by the process steps, the segment
-// cards, the value props, and the scenario outcomes, so a checkmark means
-// the same thing (a real, delivered result) everywhere it appears on the
-// page, matching towardsai.com's checkmark-bullet pattern.
-.erasight-checklist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  li {
-    position: relative;
-    padding-left: 1.3rem;
-    font-size: .88rem;
-    line-height: 1.6;
-    opacity: .85;
-    margin-bottom: .4rem;
-
-    &::before {
-      content: '\2713';
-      position: absolute;
-      left: 0;
-      color: var(--erasight-ember);
-      font-weight: 700;
+    &:hover, &:focus {
+      background-color: #1D3042 !important;
+      color: #0AAFA5 !important;
+      border-color: #0AAFA5 !important;
     }
+
+    .icon, i, span {
+      color: inherit !important;
+    }
+  }
+}
+
+// Course Index Inside Sidebar (Solid Pill Active & Indented Items per Screenshot 1)
+.courseindex {
+  padding: 0.85rem 0.65rem !important;
+
+  // Each section block in sidebar
+  .courseindex-section {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    padding-bottom: 0.45rem !important;
+    margin-bottom: 0.45rem !important;
+
+    // Normal section title
+    .courseindex-section-title {
+      border-radius: 8px !important;
+      padding: 0.5rem 0.75rem !important;
+      margin-bottom: 2px !important;
+      transition: all 0.15s ease !important;
+
+      .courseindex-link {
+        color: #E2E8F0 !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+      }
+
+      .courseindex-chevron,
+      .icon {
+        color: #0AAFA5 !important;
+        opacity: 0.9;
+        margin-right: 0.5rem !important;
+      }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.06) !important;
+
+        .courseindex-link {
+          color: #FFFFFF !important;
+        }
+      }
+    }
+
+    // ACTIVE / CURRENT Section: Solid Teal Pill (per Screenshot 1)
+    &.current {
+      background: transparent !important;
+      border: none !important;
+
+      > .courseindex-section-title {
+        background: linear-gradient(135deg, #0AAFA5 0%, #00877D 100%) !important;
+        color: #FFFFFF !important;
+        border-radius: 10px !important;
+        padding: 0.55rem 0.85rem !important;
+        box-shadow: 0 4px 14px rgba(10, 175, 165, 0.35) !important;
+
+        .courseindex-link,
+        .courseindex-chevron,
+        .icon, span {
+          color: #FFFFFF !important;
+          font-weight: 700 !important;
+        }
+
+        .current-badge {
+          display: none !important; // Clean look per Screenshot 1
+        }
+      }
+    }
+
+    // Sub-items (Activities) nested under section
+    .courseindex-sectioncontent {
+      list-style: none !important;
+      padding-left: 1.5rem !important;
+      margin-top: 0.25rem !important;
+      margin-bottom: 0.35rem !important;
+
+      .courseindex-item {
+        padding: 0.35rem 0.65rem !important;
+        margin-bottom: 2px !important;
+        border-radius: 6px !important;
+        transition: all 0.15s ease !important;
+
+        .courseindex-link {
+          color: #94A3B8 !important;
+          font-size: 0.88rem !important;
+          font-weight: 400 !important;
+          text-decoration: none !important;
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05) !important;
+
+          .courseindex-link {
+            color: #0AAFA5 !important;
+          }
+        }
+
+        &.active,
+        &[aria-current="true"] {
+          background-color: rgba(10, 175, 165, 0.12) !important;
+
+          .courseindex-link {
+            color: #0AAFA5 !important;
+            font-weight: 600 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ── 8c. Course Page & Cards Layout (Matching Screenshot 1) ──
+.pagelayout-course #page-header,
+#page-header {
+  background: transparent !important;
+  border-bottom: none !important;
+  padding: 1.25rem 0 0.5rem !important;
+
+  h1, .page-header-headings h1, .h1 {
+    font-family: var(--erasight-font-display) !important;
+    font-weight: 700 !important;
+    font-size: 1.85rem !important;
+    color: #FFFFFF !important;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+.course-content {
+  ul.topics,
+  ul.weeks,
+  ul.section {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  // Standalone Section Card Container (Matching Screenshot 1)
+  .section.course-section,
+  .section-item {
+    background-color: #121F2D !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem 1.75rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+
+    &:hover {
+      border-color: rgba(10, 175, 165, 0.25) !important;
+    }
+
+    &.current {
+      border-color: rgba(10, 175, 165, 0.45) !important;
+      box-shadow: 0 4px 24px rgba(10, 175, 165, 0.15) !important;
+    }
+  }
+
+  // Section Header Row: [ v ] Section Title ... [Thu gọn toàn bộ]
+  .course-section-header,
+  div[data-for="section_title"] {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .section-item .d-flex.align-items-center.position-relative {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  // The Square [ v ] Collapse/Expand Button (Matching Screenshot 1)
+  .icons-collapse-expand,
+  .btn-icon.icons-collapse-expand,
+  a[data-for="sectiontoggler"] {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 10px !important;
+    background: rgba(10, 175, 165, 0.12) !important;
+    border: 1.5px solid rgba(10, 175, 165, 0.35) !important;
+    color: #0AAFA5 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin-right: 0.85rem !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+
+    &:hover {
+      background: rgba(10, 175, 165, 0.25) !important;
+      border-color: #0AAFA5 !important;
+      color: #FFFFFF !important;
+      transform: scale(1.05);
+    }
+
+    .icon, svg, .expanded-icon, .collapsed-icon {
+      color: #0AAFA5 !important;
+      fill: #0AAFA5 !important;
+      font-size: 15px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+  }
+
+  // Section Title (Bold, crisp white)
+  .sectionname,
+  .sectionname a,
+  h3.sectionname,
+  h4.sectionname {
+    font-family: var(--erasight-font-display) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+    letter-spacing: -0.01em;
+
+    &:hover {
+      color: #0AAFA5 !important;
+    }
+  }
+
+  // Collapse / Expand All Link on right side
+  .section-collapsemenu,
+  #collapsesections,
+  .collapseexpand {
+    color: #0AAFA5 !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    opacity: 0.9;
+    transition: all 0.15s ease;
+
+    &:hover {
+      color: #E07820 !important;
+      text-decoration: underline !important;
+      opacity: 1;
+    }
+  }
+
+  // Content wrapper inside card
+  .course-content-item-content,
+  .content {
+    margin-top: 0.75rem !important;
+    padding-top: 0.35rem !important;
+  }
+
+  // Activity List inside the Card
+  ul[data-for="cmlist"],
+  ul.section.img-text {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  // Activity Item (Clean Row Layout with subtle border)
+  .activity-item {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 8px !important;
+    padding: 0.85rem 0.5rem !important;
+    margin-bottom: 0 !important;
+    transition: background 0.15s ease, transform 0.15s ease !important;
 
     &:last-child {
-      margin-bottom: 0;
+      border-bottom: none !important;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03) !important;
+      transform: translateX(4px);
+    }
+
+    .activityname a,
+    .instancename {
+      color: #0AAFA5 !important;
+      font-weight: 500 !important;
+      font-size: 1rem !important;
+      text-decoration: none !important;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: #2DD4BF !important;
+        text-decoration: underline !important;
+      }
+    }
+
+    // Activity Icon Container (Matching Screenshot 1: folder, bubble, assignment)
+    .activityiconcontainer {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 8px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-right: 0.85rem !important;
+      background: rgba(10, 175, 165, 0.12) !important;
+      border: 1px solid rgba(10, 175, 165, 0.25) !important;
+
+      .activityicon {
+        width: 20px !important;
+        height: 20px !important;
+        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+      }
+
+      &.modicon_forum, &.forum {
+        background: rgba(168, 85, 247, 0.15) !important;
+        border-color: rgba(168, 85, 247, 0.35) !important;
+      }
+
+      &.modicon_assign, &.assign {
+        background: rgba(236, 72, 153, 0.15) !important;
+        border-color: rgba(236, 72, 153, 0.35) !important;
+      }
+
+      &.modicon_resource, &.modicon_folder, &.folder {
+        background: rgba(14, 165, 233, 0.15) !important;
+        border-color: rgba(14, 165, 233, 0.35) !important;
+      }
+    }
+
+    // Activity Dates & Metadata (e.g. Opened: ... Due: ...)
+    .activity-dates,
+    [data-region="activity-dates"],
+    .activity-info {
+      color: #94A3B8 !important;
+      font-size: 0.82rem !important;
+      margin-top: 0.25rem !important;
+      margin-left: calc(36px + 0.85rem) !important;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+
+      div, span, small {
+        color: #94A3B8 !important;
+      }
+    }
+
+    .activity-description,
+    .contentafterlink {
+      margin-left: calc(36px + 0.85rem) !important;
+      color: #CBD5E1 !important;
+      font-size: 0.88rem !important;
     }
   }
 }
 
-.erasight-checkline {
-  position: relative;
-  padding-left: 1.3rem;
+// ── 8d. File Picker ("Bộ chọn tệp") & Media Modal Fix ────────
+.moodle-dialogue-base {
+  .moodle-dialogue-wrap {
+    background-color: #0E1722 !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+    overflow: hidden !important;
 
-  &::before {
-    content: '\2713';
-    position: absolute;
-    left: 0;
-    color: var(--erasight-ember);
-    font-weight: 700;
+    .moodle-dialogue-hd {
+      background-color: #0A121A !important;
+      color: #FFFFFF !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      padding: 1rem 1.25rem !important;
+
+      h3, h4, h5, .moodle-dialogue-title {
+        color: #FFFFFF !important;
+        font-family: var(--erasight-font-display) !important;
+        font-weight: 700 !important;
+        font-size: 1.15rem !important;
+      }
+
+      .yui3-button-close,
+      .closebutton {
+        color: #94A3B8 !important;
+        opacity: 0.8 !important;
+        font-size: 1.25rem !important;
+        background: transparent !important;
+        border: none !important;
+
+        &:hover {
+          color: #FFFFFF !important;
+          opacity: 1 !important;
+        }
+      }
+    }
+
+    .moodle-dialogue-bd {
+      background-color: #0E1722 !important;
+      color: #FFFFFF !important;
+      padding: 0 !important;
+    }
+
+    .moodle-dialogue-ft {
+      background-color: #0A121A !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
   }
 }
 
-.erasight-landing-section-alt {
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--erasight-mist);
-}
+// File Picker internal layout & components
+.file-picker,
+.filepicker {
+  background-color: #0E1722 !important;
+  color: #FFFFFF !important;
 
-.erasight-landing-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 1.1rem;
-}
+  // Left Repository Sidebar
+  .fp-repo-area {
+    background-color: #0B131C !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 0.75rem 0.5rem !important;
 
-.erasight-landing-head h3 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-}
+    .fp-list {
+      .fp-repo {
+        border-radius: 8px !important;
+        margin-bottom: 4px !important;
+        transition: all 0.15s ease !important;
 
-.erasight-landing-head a {
-  font-size: .8rem;
-  font-weight: 700;
-  color: var(--erasight-sky-deep);
-  text-decoration: none;
-}
+        a {
+          color: #0AAFA5 !important;
+          font-size: 0.92rem !important;
+          font-weight: 500 !important;
+          padding: 0.6rem 0.85rem !important;
+          border-radius: 8px !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 0.5rem !important;
+          text-decoration: none !important;
 
-.erasight-valueprops {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 2rem;
-}
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+            color: #2DD4BF !important;
+          }
+        }
 
-.erasight-valueprop h4 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: .4rem;
-}
+        &.active {
+          background: linear-gradient(135deg, #E07820, #C26210) !important;
+          box-shadow: 0 4px 12px rgba(224, 120, 32, 0.35) !important;
 
-.erasight-valueprop p {
-  font-size: .88rem;
-  line-height: 1.6;
-  opacity: .85;
-}
+          a {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            background: transparent !important;
+          }
+        }
+      }
+    }
+  }
 
-.erasight-landing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
-  gap: 1rem;
-}
+  // Right Content Area (Fixing White Background Bug)
+  .fp-content {
+    background-color: #121F2D !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    padding: 1.25rem !important;
 
-.erasight-landing-card {
-  display: block;
-  text-decoration: none;
-  color: var(--erasight-ink);
-  border: 1px solid var(--erasight-mist);
-  border-radius: $border-radius-lg;
-  overflow: hidden;
-  background: var(--erasight-surface);
-  transition: transform .15s ease, box-shadow .15s ease;
+    // All labels must be crisp, high-contrast white/light-grey
+    label,
+    .form-label,
+    .col-form-label {
+      color: #F1F5F9 !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
+      margin-bottom: 0.4rem !important;
+      display: block !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px -16px rgba(36, 23, 8, .25);
-    color: var(--erasight-ink);
-    text-decoration: none;
+    // Input fields inside filepicker
+    input[type="text"],
+    input[type="file"],
+    select,
+    .form-control {
+      background-color: #172635 !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 8px !important;
+      padding: 0.6rem 0.85rem !important;
+      font-size: 0.92rem !important;
+      margin-bottom: 1rem !important;
+
+      &:focus {
+        background-color: #1E3144 !important;
+        border-color: #0AAFA5 !important;
+        box-shadow: 0 0 0 3px rgba(10, 175, 165, 0.25) !important;
+        color: #FFFFFF !important;
+      }
+    }
+
+    // Submit button (Nộp / Upload)
+    .fp-upload-btn,
+    .btn-primary,
+    button[type="submit"] {
+      background: linear-gradient(135deg, #E07820, #C26210) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+      padding: 0.6rem 2rem !important;
+      font-size: 0.95rem !important;
+      box-shadow: 0 4px 14px rgba(224, 120, 32, 0.35) !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+
+      &:hover {
+        background: linear-gradient(135deg, #F08830, #D27220) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(224, 120, 32, 0.45) !important;
+      }
+    }
+  }
+
+  // Top navbar inside filepicker
+  .fp-navbar {
+    background-color: #162536 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 0.5rem 0.75rem !important;
+
+    .fp-toolbar {
+      a, .btn, button {
+        background-color: #1F3347 !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #FFFFFF !important;
+        border-radius: 6px !important;
+        padding: 0.35rem 0.65rem !important;
+      }
+    }
+
+    .fp-viewbar a {
+      background-color: #1F3347 !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #FFFFFF !important;
+
+      &.checked {
+        background-color: #0AAFA5 !important;
+        border-color: #0AAFA5 !important;
+        color: #FFFFFF !important;
+      }
+    }
+  }
+
+  // Drag and drop container
+  .filepicker-filelist .dndupload-target,
+  .filepicker-container,
+  .filemanager-container {
+    background-color: #142230 !important;
+    border: 2px dashed rgba(10, 175, 165, 0.4) !important;
+    border-radius: 12px !important;
+    color: #94A3B8 !important;
+
+    &:hover {
+      border-color: #0AAFA5 !important;
+      background-color: rgba(10, 175, 165, 0.08) !important;
+    }
   }
 }
 
-.erasight-landing-thumb {
-  height: 110px;
-  background-color: var(--erasight-mist);
-  background-size: cover;
-  background-position: center;
-}
+// ── 8e. Footer Visibility & Scroll Container Fix ─────────────
+#page.drawers {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
 
-.erasight-landing-cardbody {
-  padding: .85rem 1rem 1rem;
-}
+  .main-inner-wrapper {
+    flex: 1 0 auto !important;
+  }
 
-.erasight-landing-cat {
-  display: inline-block;
-  font-size: .66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--erasight-sky-deep);
-  background: var(--erasight-sky-tint);
-  padding: .2rem .5rem;
-  border-radius: 999px;
-  margin-bottom: .4rem;
-}
-
-.erasight-landing-cardbody h4 {
-  font-size: .92rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin-bottom: .4rem;
-}
-
-.erasight-landing-desc {
-  font-size: .8rem;
-  line-height: 1.5;
-  opacity: .8;
-  margin-bottom: .6rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.erasight-landing-price {
-  font-family: var(--erasight-font-mono);
-  font-weight: 700;
-  color: var(--erasight-ember);
-}
-
-// Three-way segment cards (Individuals / Teams / Enterprise) — heading +
-// checklist + link, matching towardsai.com's "three ways we help" card
-// pattern structurally, in Erasight's own colors/type.
-.erasight-segments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-}
-
-.erasight-segment {
-  border: 1px solid var(--erasight-mist);
-  border-radius: $border-radius-lg;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.erasight-segment h4 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: .9rem;
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.erasight-segment-badge {
-  font-size: .62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--erasight-sky-deep);
-  background: var(--erasight-sky-tint);
-  padding: .15rem .5rem;
-  border-radius: 999px;
-}
-
-.erasight-segment .erasight-checklist {
-  flex: 1;
-  margin-bottom: 1.1rem;
-}
-
-.erasight-segment-link {
-  font-size: .82rem;
-  font-weight: 700;
-  color: var(--erasight-sky-deep);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
+  .erasight-sitefooter {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
   }
 }
 
-.erasight-testimonial-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-}
+#page-footer.footer-popover {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
 
-.erasight-tcard {
-  border: 1px solid var(--erasight-mist);
-  border-radius: $border-radius-lg;
-  background: var(--erasight-surface);
-  padding: 1.1rem;
-}
-
-.erasight-tcard blockquote {
-  margin: 0 0 .9rem;
-  font-size: .87rem;
-  line-height: 1.6;
-}
-
-.erasight-tcard-who {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  font-size: .78rem;
-}
-
-.erasight-tcard-who span {
-  display: block;
-  opacity: .8;
-}
-
-.erasight-tcard-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--erasight-umber);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--erasight-font-display);
-  font-weight: 700;
-  font-size: .72rem;
-  flex: none;
-}
-
-.erasight-scenario-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.erasight-scenario-card {
-  border: 1px solid var(--erasight-mist);
-  border-radius: $border-radius-lg;
-  padding: 1.1rem;
-  background: var(--erasight-surface);
-}
-
-.erasight-scenario-problem {
-  font-size: .8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--erasight-ember);
-  margin-bottom: .5rem;
-}
-
-.erasight-scenario-outcome {
-  font-size: .88rem;
-  line-height: 1.6;
-}
-
-.erasight-teams-band {
-  background: linear-gradient(120deg, var(--erasight-umber), #3a2a17);
-  color: #fff;
-  border-radius: $border-radius-lg;
-  padding: 2rem 2.2rem;
-}
-
-.erasight-teams-band h3 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.3rem;
-  font-weight: 800;
-  margin-bottom: .5rem;
-}
-
-.erasight-teams-band p {
-  font-size: .87rem;
-  opacity: .92;
-  max-width: 48ch;
-  margin-bottom: 1.1rem;
-}
-
-.erasight-closing-cta {
-  text-align: center;
-  padding: 2rem 1rem;
-  border-top: 1px solid var(--erasight-mist);
-}
-
-.erasight-closing-cta h3 {
-  font-family: var(--erasight-font-display);
-  font-size: 1.4rem;
-  font-weight: 800;
-  margin-bottom: 1.25rem;
-}
-
-.erasight-closing-cta .erasight-hero-cta {
-  justify-content: center;
-  margin-bottom: 0;
-}
-
-// Sitewide footer band — injected on every page via
-// before_standard_footer_html_generation (classes/hook_callbacks.php),
-// not scoped to the front page. Self-contained colors via the theme's own
-// custom-property tokens rather than relying on whatever background
-// Boost Union's own #page-footer wrapper happens to have.
-.erasight-sitefooter {
-  background: var(--erasight-bg);
-  color: var(--erasight-ink);
-  border-top: 1px solid var(--erasight-mist);
-  padding: 2.5rem 1.5rem 1.5rem;
-}
-
-.erasight-sitefooter-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  justify-content: space-between;
-}
-
-.erasight-sitefooter-brand {
-  flex: 1 1 240px;
-  max-width: 320px;
-}
-
-.erasight-sitefooter-name {
-  font-family: var(--erasight-font-display);
-  font-weight: 800;
-  font-size: 1.1rem;
-  margin-bottom: .5rem;
-}
-
-.erasight-sitefooter-brand p {
-  font-size: .85rem;
-  line-height: 1.6;
-  opacity: .8;
-}
-
-.erasight-sitefooter-heading {
-  font-size: .7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  opacity: .65;
-  margin-bottom: .9rem;
-}
-
-.erasight-sitefooter-links ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.erasight-sitefooter-links li {
-  margin-bottom: .6rem;
-}
-
-.erasight-sitefooter-links a {
-  font-size: .87rem;
-  color: var(--erasight-ink);
-  text-decoration: none;
-  opacity: .85;
-
-  &:hover {
-    opacity: 1;
-    text-decoration: underline;
+  .footer-content-popover {
+    background-color: #121F2D !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 12px !important;
   }
 }
 
-.erasight-sitefooter-icons {
-  display: flex;
-  gap: .75rem;
-}
-
-.erasight-social-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border: 1px solid var(--erasight-mist);
-  border-radius: 999px;
-  color: var(--erasight-ink);
-  opacity: .8;
-  transition: opacity .15s ease, border-color .15s ease, color .15s ease;
-
-  &:hover {
-    opacity: 1;
-    border-color: var(--erasight-ember);
-    color: var(--erasight-ember);
+// ── 9. Mobile Responsive ──────────────────────────────────
+@media (max-width: 480px) {
+  .erasight-hero {
+    padding: 3rem 1rem 2.5rem;
   }
-}
 
-.erasight-sitefooter-bottom {
-  max-width: 1100px;
-  margin: 2rem auto 0;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--erasight-mist);
-  font-size: .78rem;
-  opacity: .6;
+  .erasight-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .erasight-hero-tagline {
+    font-size: .9rem;
+  }
+
+  .erasight-section-title {
+    font-size: 1.15rem;
+  }
+
+  .erasight-course-img {
+    height: 140px;
+  }
+
+  .erasight-instructor {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .erasight-closing {
+    padding: 2rem 1rem;
+  }
 }

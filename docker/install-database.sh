@@ -126,3 +126,13 @@ if ! php admin/cli/cfg.php --name=theme >/dev/null 2>&1; then
   php admin/cli/cfg.php --name=theme --set=erasight
   echo "Theme was never explicitly set — defaulted to erasight."
 fi
+
+# By default, Moodle sets numsections (number of empty topics/weeks created 
+# when a new course is made) to 4. We want new courses to start completely 
+# clean (only the General section with Announcements).
+php admin/cli/cfg.php --component=moodlecourse --name=numsections --set=0
+echo "Set default course sections to 0."
+
+# Inject custom Lightbox JS into Additional HTML footer for uploaded images
+php -r "define('CLI_SCRIPT', true); require('config.php'); set_config('additionalhtmlfooter', file_get_contents('/var/www/html/lightbox.html'));"
+echo "Lightbox script injected."

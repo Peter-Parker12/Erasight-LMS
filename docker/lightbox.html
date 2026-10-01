@@ -1,0 +1,136 @@
+<style>
+.erasight-lightbox {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 20, 29, 0.9);
+    backdrop-filter: blur(5px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.erasight-lightbox.show {
+    opacity: 1;
+}
+.erasight-lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+.erasight-lightbox.show img {
+    transform: scale(1);
+}
+.user-zoomable-img {
+    cursor: zoom-in !important;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectors = '.no-overflow img:not(.icon):not(.emoticon):not(.smallicon), .forumpost img:not(.icon):not(.emoticon):not(.smallicon), .post-content-container img:not(.icon):not(.emoticon):not(.smallicon), .generalbox img:not(.icon):not(.emoticon):not(.smallicon), .editor_atto_content img:not(.icon):not(.emoticon):not(.smallicon), .editor_tinymce_content img:not(.icon):not(.emoticon):not(.smallicon)';
+    
+    // Use event delegation for images loaded dynamically
+    document.body.addEventListener('click', function(e) {
+        if (e.target.matches(selectors)) {
+            e.preventDefault();
+            const lightbox = document.createElement('div');
+            lightbox.className = 'erasight-lightbox';
+            const img = document.createElement('img');
+            img.src = e.target.src;
+            lightbox.appendChild(img);
+            document.body.appendChild(lightbox);
+            
+            // Trigger reflow for transition
+            void lightbox.offsetWidth;
+            lightbox.classList.add('show');
+            
+            lightbox.addEventListener('click', function() {
+                lightbox.classList.remove('show');
+                setTimeout(() => lightbox.remove(), 200);
+            });
+        }
+    });
+
+    // Add cursor style immediately to existing images
+    const images = document.querySelectorAll(selectors);
+    images.forEach(img => img.classList.add('user-zoomable-img'));
+    
+    // Add cursor style to dynamically added images (e.g. infinite scroll forums)
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1) { // Element node
+                    if (node.matches && node.matches(selectors)) {
+                        node.classList.add('user-zoomable-img');
+                    }
+                    const children = node.querySelectorAll ? node.querySelectorAll(selectors) : [];
+                    children.forEach(img => img.classList.add('user-zoomable-img'));
+                }
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // ── Quick Add Button Logic ──
+    const navUl = document.querySelector('.secondary-navigation .navigation .nav-tabs') || document.querySelector('.secondary-navigation .nav');
+    const isCoursePage = document.body.classList.contains('path-course-view');
+
+    // Reliable course ID extraction from Moodle's body classes
+    let courseId = null;
+    const courseMatch = document.body.className.match(/course-(\d+)/);
+    if (courseMatch) {
+        courseId = parseInt(courseMatch[1], 10);
+    }
+
+    // Only inject if in a course (ID > 1 avoids site home)
+    if (courseId && courseId > 1 && navUl && !document.getElementById('erasight-quick-add-btn')) {
+        const li = document.createElement('li');
+        li.className = 'nav-item ms-auto d-flex align-items-center me-3 dropdown';
+        li.style.marginLeft = 'auto'; // Force right align
+        li.style.flexShrink = '0'; // Prevent shrinking
+        li.innerHTML = `
+            <button id="erasight-quick-add-btn" class="dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: #E87A31; color: #fff; border: none; border-radius: 8px; padding: 0 16px; height: 38px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s ease; margin-left: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap !important; min-width: max-content !important;">
+                <i class="fa fa-plus"></i> Soạn giáo án / BTVN
+            </button>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-end" aria-labelledby="erasight-quick-add-btn" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); margin-top: 8px; min-width: 250px;">
+                <h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Tạo nhanh (Mặc định ở mục Chung)</h6>
+                <a class="dropdown-item py-2 d-flex align-items-center" href="/course/modedit.php?add=assign&course=${courseId}&section=0&sr=0" style="gap: 12px; font-weight: 500;">
+                    <span style="display:flex; align-items:center; justify-content:center; width: 32px; height: 32px; background: rgba(232, 122, 49, 0.1); border-radius: 6px; color: #E87A31;"><i class="fa fa-edit"></i></span> Giao Bài tập (Assignment)
+                </a>
+                <a class="dropdown-item py-2 d-flex align-items-center" href="/course/modedit.php?add=resource&course=${courseId}&section=0&sr=0" style="gap: 12px; font-weight: 500;">
+                    <span style="display:flex; align-items:center; justify-content:center; width: 32px; height: 32px; background: rgba(10, 175, 165, 0.1); border-radius: 6px; color: #0AAFA5;"><i class="fa fa-file-pdf-o"></i></span> Tải lên Tài liệu (File PDF/Word)
+                </a>
+                <a class="dropdown-item py-2 d-flex align-items-center" href="/course/modedit.php?add=url&course=${courseId}&section=0&sr=0" style="gap: 12px; font-weight: 500;">
+                    <span style="display:flex; align-items:center; justify-content:center; width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; color: #3b82f6;"><i class="fa fa-link"></i></span> Chèn Link Video / Web
+                </a>
+                <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Quản lý nâng cao</h6>
+                <a class="dropdown-item py-2 d-flex align-items-center" href="#" id="erasight-enable-edit-btn" style="gap: 12px; font-weight: 500;">
+                    <span style="display:flex; align-items:center; justify-content:center; width: 32px; height: 32px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; color: #10b981;"><i class="fa fa-sliders"></i></span> Bật Edit Mode (Để sửa giao diện)
+                </a>
+            </div>
+        `;
+        navUl.appendChild(li);
+
+        const quickBtn = li.querySelector('#erasight-quick-add-btn');
+        quickBtn.addEventListener('mouseenter', () => quickBtn.style.background = '#d66a25');
+        quickBtn.addEventListener('mouseleave', () => quickBtn.style.background = '#E87A31');
+
+        // Handle the "Bật Edit Mode" fallback button
+        const editModeBtn = li.querySelector('#erasight-enable-edit-btn');
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sesskey = (window.M && window.M.cfg && window.M.cfg.sesskey) ? window.M.cfg.sesskey : '';
+                const editParam = sesskey ? '&edit=1&sesskey=' + sesskey : '&edit=1';
+                window.location.href = '/course/view.php?id=' + courseId + editParam;
+            });
+        }
+    }
+});
+</script>

@@ -818,6 +818,9 @@ h1, h2, h3, .navbar-brand {
   padding: 0 !important;
   margin: 0 0 2rem 0 !important;
   width: 100% !important;
+  overflow: visible !important; // Prevent clipping
+  z-index: 1050 !important; // Ensure it floats above the main content area
+  position: relative !important;
 
   .navigation {
     background: transparent !important;
@@ -825,6 +828,7 @@ h1, h2, h3, .navbar-brand {
     margin: 0 auto !important;
     max-width: 1320px !important;
     padding: 0 1rem !important;
+    overflow: visible !important;
 
     .nav-tabs {
       border: none !important;
@@ -833,12 +837,7 @@ h1, h2, h3, .navbar-brand {
       gap: 0.25rem !important;
       margin: 0 !important;
       padding: 0 !important;
-      overflow-x: auto;
-      scrollbar-width: none;
-
-      &::-webkit-scrollbar {
-        display: none;
-      }
+      overflow: visible !important; // FIX: Allows dropdown to pop out instead of getting clipped by the nav container
 
       .nav-item {
         margin: 0 !important;
@@ -890,12 +889,8 @@ h1, h2, h3, .navbar-brand {
 
   .activity-details:not(:empty),
   .activity-information,
-  .activity-description,
   [data-region="activity-details"],
-  [data-region="activity-information"],
-  .generalbox,
-  .boxaligncenter,
-  #intro {
+  [data-region="activity-information"] {
     background-color: #121F2D !important;
     color: #FFFFFF !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -904,6 +899,20 @@ h1, h2, h3, .navbar-brand {
     margin-top: 1rem !important;
     margin-bottom: 1.75rem !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+
+    /* Prevent nested boxes from rendering additional backgrounds inside the main activity info box */
+    .activity-description,
+    [data-region="activity-description"],
+    .generalbox,
+    .boxaligncenter,
+    #intro,
+    .box {
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
 
     p, span, div, strong, small {
       color: #FFFFFF !important;
@@ -946,11 +955,6 @@ h1, h2, h3, .navbar-brand {
 
 .generalbox,
 .box.py-3 {
-  background-color: #121F2D !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
-
   p, span, div {
     color: #FFFFFF !important;
   }
@@ -1386,7 +1390,6 @@ body.pagelayout-frontpage {
       padding: 0 !important;
       margin: 0 !important;
       line-height: 1 !important;
-      display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
     }
@@ -1784,6 +1787,31 @@ body.pagelayout-frontpage {
   }
 }
 
+  // Grader Report specific dark mode overrides
+  .path-grade-report-grader {
+    .gradereport-grader-table {
+      background-color: var(--erasight-surface) !important;
+      
+      th, td, .header, .cell, .userfield, .courseitem, .categoryitem {
+        background-color: var(--erasight-surface) !important;
+        color: var(--erasight-ink) !important;
+        border-color: var(--erasight-mist) !important;
+      }
+      
+      .sticky-column, .sticky-col, thead th, th.header {
+        background-color: #0F1A24 !important;
+        color: #F1F5F9 !important;
+        border-color: var(--erasight-mist) !important;
+      }
+
+      a {
+        color: #0AAFA5 !important;
+      }
+    }
+  }
+
+}
+
 // ── 9. Mobile Responsive ──────────────────────────────────
 @media (max-width: 480px) {
   .erasight-hero {
@@ -1816,3 +1844,57 @@ body.pagelayout-frontpage {
     padding: 2rem 1rem;
   }
 }
+
+// ── 12. User Generated Content Images (Smart Gallery Layout) ──
+$user-content-selectors: '.no-overflow, .forumpost, .post-content-container, .generalbox, .editor_atto_content, .editor_tinymce_content';
+
+#{$user-content-selectors} {
+  // Base style for all user-uploaded images (centers 1 image automatically)
+  img:not(.icon):not(.emoticon):not(.smallicon) {
+    max-width: 100% !important;
+    max-height: 320px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    margin: 1rem auto !important; // Center horizontally
+    display: block; // Prevents inline text wrapping issues
+  }
+
+  // 2 Images Layout: Split evenly (1x2 Grid)
+  p:has(> img:not(.icon):first-child:nth-last-child(2)),
+  div:has(> img:not(.icon):first-child:nth-last-child(2)) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+    margin: 1rem 0 !important;
+
+    img {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 320px !important;
+      object-fit: cover !important; // Fill the grid cell evenly
+      margin: 0 !important;
+    }
+  }
+
+  // 4 Images Layout: 2x2 Grid
+  p:has(> img:not(.icon):first-child:nth-last-child(4)),
+  div:has(> img:not(.icon):first-child:nth-last-child(4)) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+    margin: 1rem 0 !important;
+
+    img {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 240px !important;
+      object-fit: cover !important;
+      margin: 0 !important;
+    }
+  }
+}
+

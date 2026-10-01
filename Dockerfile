@@ -86,6 +86,7 @@ COPY --from=fetch /src-boost-union /var/www/html/public/theme/boost_union
 # shim (unlike config.php/admin/cli, which stayed at the repo root).
 COPY docker/theme-erasight /var/www/html/public/theme/erasight
 COPY docker/local-erasight /var/www/html/public/local/erasight
+COPY docker/lightbox.html /var/www/html/lightbox.html
 COPY --from=fetch /src-webservice-mcp /var/www/html/public/webservice/mcp
 COPY docker/config.php /var/www/html/config.php
 COPY docker/install-database.sh /usr/local/bin/install-database.sh

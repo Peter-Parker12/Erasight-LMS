@@ -1751,10 +1751,12 @@ body.pagelayout-frontpage {
 
 // ── 8e. Footer Visibility & Scroll Container Fix ─────────────
 #page.drawers {
-  min-height: 100vh !important;
+  height: calc(100vh - 60px) !important;
+  min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
 
   .main-inner-wrapper {
     flex: 1 0 auto !important;
@@ -1784,6 +1786,28 @@ body.pagelayout-frontpage {
     color: #FFFFFF !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 12px !important;
+  }
+
+  .btn-footer-popover {
+    background-color: #142230 !important;
+    color: #0AAFA5 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+    
+    .icon {
+      color: #0AAFA5 !important;
+    }
+    
+    &:hover, &:focus {
+      background-color: #1D3042 !important;
+      border-color: #0AAFA5 !important;
+      transform: translateY(-2px);
+      
+      .icon {
+        color: #FFFFFF !important;
+      }
+    }
   }
 }
 
